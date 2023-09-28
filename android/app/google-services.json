@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "37340311475",
+    "project_id": "rencity-2f771",
+    "storage_bucket": "rencity-2f771.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:37340311475:android:c641f9bd6ce833b78b65c6",
+        "android_client_info": {
+          "package_name": "com.ikitech.rencity"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "37340311475-0v35u6g7eennvpmr5tk0ghbarhkv6p7s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzhm-nPFM1OaNOgDIInWnPqXUhk4Afzng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "37340311475-0v35u6g7eennvpmr5tk0ghbarhkv6p7s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "37340311475-2gqa80r6c445e5e2fbq7caarou9rv2i5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ikitech.gohomy"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,72 @@
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:gohomy/const/color.dart';
+import 'package:gohomy/const/image_assets.dart';
+import 'package:gohomy/screen/profile/profile_details/widget/custom_button.dart';
+import 'package:gohomy/screen/profile/profile_details/widget/image_picker_tile.dart';
+
+import '../controller/registration_controller.dart';
+import '../repository/image_repository.dart';
+import 'back_card_verification_page.dart';
+import 'widgets/card_verification_tile.dart';
+
+class FrontCardVerificationPage extends StatelessWidget {
+  const FrontCardVerificationPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    RegistrationController registrationController = Get.put(RegistrationController());
+    return Scaffold(
+      backgroundColor: Colors.black12,
+      appBar: AppBar(
+        backgroundColor: Colors.black12,
+        iconTheme: const IconThemeData(
+          color: AppColor.dark5,
+        ),
+        elevation: 0,
+        title: const Text(
+          "Chụp ảnh xác minh",
+          style: TextStyle(color: AppColor.dark5),
+        ),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          CardVerificationTile(
+            title: "mặt trước CMND/CCCD",
+            instruction:
+                "Xin đưa mặt trước của CMND/CCCD vào khung hình, hệ thống sẽ chụp tự động",
+            imgPath: ImageAssets.imgFrontCard,
+          ),
+          const Spacer(),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: ImagePickerTile(
+              child: CustomButton(
+                title: 'Tiếp tục',
+                width: size.width * 0.6,
+                radius: 10,
+              ),
+              onSelectImage: (imagePath) async {
+                log(imagePath.toString());
+                registrationController.frontCardImagePath.value = imagePath!;
+                String recognizedText = await ImageRepository.instance
+                    .convertImageToText(imagePath: imagePath);
+                log(recognizedText);
+                // scannedFrontCardText = recognizedText;
+                registrationController.scannedFrontCardText.value = recognizedText;
+                Future.delayed(Duration.zero, () {
+                 Get.to(() => const BackCardVerificationPage());
+                });
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
