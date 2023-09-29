@@ -158,11 +158,17 @@ class AdminManageRepository {
     return null;
   }
 
-  Future<MotelRoomRes?> updateMotelRoomHiddenStatus(motelId, newStatus) async {
+  Future<MotelRoomRes?> updateMotelRoomHiddenStatus({
+    required int motelId,
+    required int status,
+    required int towerMotelId,
+  }) async {
     try {
-      var res = await SahaServiceManager()
-          .service!
-          .updateMotelHiddenStatus({"status": newStatus, "tower_motel_id": motelId});
+      var res = await SahaServiceManager().service!.updateMotelHiddenStatus({
+        "motel_id": motelId,
+        "status": status,
+        "tower_motel_id": towerMotelId,
+      });
       return res;
     } catch (err) {
       handleError(err);

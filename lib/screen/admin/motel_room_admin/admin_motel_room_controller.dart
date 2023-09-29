@@ -75,9 +75,17 @@ class AdminMotelRoomController extends GetxController {
     }
   }
 
-  Future<void> updateMotelRoomHiddenStatus(motelId, newStatus) async {
+  Future<void> updateMotelRoomHiddenStatus({
+    required int motelId,
+    required int status,
+    required int towerMotelId,
+  }) async {
     try {
-      var res = await RepositoryManager.adminManageRepository.updateMotelRoomHiddenStatus(motelId, newStatus);
+      var res = await RepositoryManager.adminManageRepository.updateMotelRoomHiddenStatus(
+        motelId: motelId,
+        status: status,
+        towerMotelId: towerMotelId,
+      );
       if (res != null) {
         SahaAlert.showSuccess(message: "Thành công");
       }

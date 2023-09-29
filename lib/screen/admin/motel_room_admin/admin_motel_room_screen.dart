@@ -734,14 +734,22 @@ class _AdminMotelRoomScreenState extends State<AdminMotelRoomScreen>
                             mess: "Bạn chắc chắn muốn ẩn phòng không?",
                             onOK: () {
                               widget.adminMotelRoomController
-                                  .updateMotelRoomHiddenStatus(item.id, true);
+                                  .updateMotelRoomHiddenStatus(
+                                motelId: item.id!,
+                                status: 0,
+                                towerMotelId: item.towerId!,
+                              );
                             });
                       } else {
                         SahaDialogApp.showDialogYesNo(
                             mess: "Bạn chắc chắn muốn hiện lại phòng không?",
                             onOK: () {
                               widget.adminMotelRoomController
-                                  .updateMotelRoomHiddenStatus(item.id, false);
+                                  .updateMotelRoomHiddenStatus(
+                                motelId: item.id!,
+                                status: 1,
+                                towerMotelId: item.towerId!,
+                              );
                             });
                       }
                     },
