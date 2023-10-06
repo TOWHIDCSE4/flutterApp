@@ -7,7 +7,7 @@ class SahaTextFieldNoBorder extends StatefulWidget {
   final String labelText;
   final bool withAsterisk;
   final String? suffix;
-  final Icon? icon;
+  final Widget? icon;
   final List<TextInputFormatter>? inputFormatters;
   final TextEditingController? controller;
   final Function(String?)? onChanged;
@@ -80,6 +80,7 @@ class _SahaTextFieldNoBorderState extends State<SahaTextFieldNoBorder> {
             contentPadding: const EdgeInsets.only(top: 15, bottom: 3),
             helperText: widget.helperText,
             border: InputBorder.none,
+            suffixIcon: widget.icon,
             suffixText: widget.suffixText,
             suffixStyle: const TextStyle(fontSize: 12, color: Colors.grey),
             focusedBorder: InputBorder.none,

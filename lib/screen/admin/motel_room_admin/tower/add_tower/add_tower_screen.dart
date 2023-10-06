@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gohomy/components/arlert/saha_alert.dart';
 import 'package:gohomy/components/loading/loading_full_screen.dart';
+import 'package:gohomy/const/color.dart';
+import 'package:gohomy/screen/admin/motel_room_admin/tower/add_tower/map/map_screen.dart';
 import 'package:pattern_formatter/numeric_formatter.dart';
 import 'package:video_compress/video_compress.dart';
 
@@ -148,67 +150,12 @@ class AddTowerScreen extends StatelessWidget {
 
                         InkWell(
                           onTap: () {
-                            SahaDialogApp.showDialogAddressChoose(
-                              hideAll: true,
-                              accept: () {},
-                              callback: (v) {
-                                controller.locationProvince.value = v;
-                                controller.towerReq.value.province = v.id;
-                                Get.back();
-                                SahaDialogApp.showDialogAddressChoose(
-                                  hideAll: true,
-                                  accept: () {},
-                                  idProvince:
-                                      controller.locationProvince.value.id,
-                                  callback: (v) {
-                                    controller.locationDistrict.value = v;
-                                    controller.towerReq.value.district = v.id;
-                                    Get.back();
-                                    SahaDialogApp.showDialogAddressChoose(
-                                      hideAll: true,
-                                      accept: () {},
-                                      idDistrict:
-                                          controller.locationDistrict.value.id,
-                                      callback: (v) {
-                                        controller.locationWard.value = v;
-                                        controller.towerReq.value.wards = v.id;
-                                        Get.back();
-                                        SahaDialogApp.showDialogInputNote(
-                                            height: 50,
-                                            confirm: (v) {
-                                              if (v == null || v == "") {
-                                                SahaAlert.showToastMiddle(
-                                                    message:
-                                                        "Vui lòng nhập địa chỉ chi tiết");
-                                              } else {
-                                                controller.towerReq.value
-                                                    .addressDetail = v;
-                                                controller.towerReq.refresh();
-                                                var province =
-                                                    controller.locationProvince;
-                                                var district =
-                                                    controller.locationDistrict;
-                                                var ward =
-                                                    controller.locationWard;
-                                                controller
-                                                        .addressTextEditingController
-                                                        .text =
-                                                    "${controller.towerReq.value.addressDetail} - ${ward.value.name} - ${district.value.name} - ${province.value.name}";
-                                              }
-                                            },
-                                            title: "Địa chỉ chi tiết",
-                                            textInput: controller.towerReq.value
-                                                    .addressDetail ??
-                                                "");
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                            );
+                            // onSelectAddress();
+                            Get.to(() => const MapScreen());
                           },
                           child: SahaTextFieldNoBorder(
                             enabled: false,
+                            icon: const Icon(Icons.location_pin, color: AppColor.primaryColor,),
                             labelText: "Địa chỉ",
                             textInputType: TextInputType.text,
                             controller: controller.addressTextEditingController,
@@ -946,6 +893,56 @@ class AddTowerScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void onSelectAddress() {
+    SahaDialogApp.showDialogAddressChoose(
+      hideAll: true,
+      accept: () {},
+      callback: (v) {
+        controller.locationProvince.value = v;
+        controller.towerReq.value.province = v.id;
+        Get.back();
+        SahaDialogApp.showDialogAddressChoose(
+          hideAll: true,
+          accept: () {},
+          idProvince: controller.locationProvince.value.id,
+          callback: (v) {
+            controller.locationDistrict.value = v;
+            controller.towerReq.value.district = v.id;
+            Get.back();
+            SahaDialogApp.showDialogAddressChoose(
+              hideAll: true,
+              accept: () {},
+              idDistrict: controller.locationDistrict.value.id,
+              callback: (v) {
+                controller.locationWard.value = v;
+                controller.towerReq.value.wards = v.id;
+                Get.back();
+                SahaDialogApp.showDialogInputNote(
+                    height: 50,
+                    confirm: (v) {
+                      if (v == null || v == "") {
+                        SahaAlert.showToastMiddle(
+                            message: "Vui lòng nhập địa chỉ chi tiết");
+                      } else {
+                        controller.towerReq.value.addressDetail = v;
+                        controller.towerReq.refresh();
+                        var province = controller.locationProvince;
+                        var district = controller.locationDistrict;
+                        var ward = controller.locationWard;
+                        controller.addressTextEditingController.text =
+                            "${controller.towerReq.value.addressDetail} - ${ward.value.name} - ${district.value.name} - ${province.value.name}";
+                      }
+                    },
+                    title: "Địa chỉ chi tiết",
+                    textInput: controller.towerReq.value.addressDetail ?? "");
+              },
+            );
+          },
+        );
+      },
     );
   }
 
