@@ -148,23 +148,38 @@ class AddTowerScreen extends StatelessWidget {
 
                         SahaDivide(),
 
-                        InkWell(
-                          onTap: () {
-                            // onSelectAddress();
-                            Get.to(() => const MapScreen());
-                          },
-                          child: SahaTextFieldNoBorder(
-                            enabled: false,
-                            icon: const Icon(Icons.location_pin, color: AppColor.primaryColor,),
-                            labelText: "Địa chỉ",
-                            textInputType: TextInputType.text,
-                            controller: controller.addressTextEditingController,
-                            withAsterisk: true,
-                            onChanged: (v) {
-                              //addPostController.postReq.value.name = v;
-                            },
-                            hintText: "Chọn địa chỉ",
-                          ),
+                        Stack(
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                onSelectAddress();
+                              },
+                              child: SahaTextFieldNoBorder(
+                                enabled: false,
+                                icon: const Icon(Icons.location_pin, color: Colors.transparent,),
+                                labelText: "Địa chỉ",
+                                textInputType: TextInputType.text,
+                                controller: controller.addressTextEditingController,
+                                withAsterisk: true,
+                                onChanged: (v) {
+                                  //addPostController.postReq.value.name = v;
+                                },
+                                hintText: "Chọn địa chỉ",
+                              ),
+                            ),
+                            Positioned.fill(
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: IconButton(
+                                  onPressed: () {
+                                    Get.to(() => const MapScreen());
+                                  },
+                                  icon: const Icon(Icons.location_pin),
+                                  color: AppColor.primaryColor,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         SahaDivide(),
                         SahaTextFieldNoBorder(
