@@ -1,5 +1,9 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_google_places/flutter_google_places.dart' as loc;
+import 'package:google_api_headers/google_api_headers.dart' as header;
+import 'package:google_maps_webservice/places.dart' as places;
 
 import 'direction_model.dart';
 import 'direction_repository.dart';
@@ -8,7 +12,7 @@ class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
   @override
-   State<MapScreen> createState() => _MapScreenState();
+  State<MapScreen> createState() => _MapScreenState();
 }
 
 class _MapScreenState extends State<MapScreen> {
@@ -21,6 +25,8 @@ class _MapScreenState extends State<MapScreen> {
   Marker? _origin;
   Marker? _destination;
   Directions? _info;
+  final Map<String, Marker> _markers = {};
+  GoogleMapController? _controller;
 
   @override
   void dispose() {
@@ -35,6 +41,11 @@ class _MapScreenState extends State<MapScreen> {
         centerTitle: false,
         title: const Text('Google Maps'),
         actions: [
+          if (_origin == null || _destination == null)
+            IconButton(
+              onPressed: _handleSearch,
+              icon: const Icon(Icons.search),
+            ),
           if (_origin != null)
             TextButton(
               onPressed: () => _googleMapController?.animateCamera(
@@ -174,5 +185,66 @@ class _MapScreenState extends State<MapScreen> {
           .getDirections(origin: _origin!.position, destination: pos);
       setState(() => _info = directions);
     }
+  }
+
+  Future<void> _handleSearch() async {
+    places.Prediction? p = await loc.PlacesAutocomplete.show(
+        context: context,
+        apiKey: 'AIzaSyAojG0m2L8gnI4GFn5qR5VmqrDOLlCDNY4',
+        onError: onError, // call the onError function below
+        mode: loc.Mode.overlay,
+        language: 'en', //you can set any language for search
+        strictbounds: false,
+        types: [],
+        decoration: InputDecoration(
+            hintText: 'search',
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: const BorderSide(color: Colors.white))),
+        components: [] // you can determine search for just one country
+        );
+
+    displayPrediction(p!);
+  }
+
+  void onError(places.PlacesAutocompleteResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: 'Message',
+        message: response.errorMessage!,
+        contentType: ContentType.failure,
+      ),
+    ));
+  }
+
+  Future<void> displayPrediction(places.Prediction p) async {
+    places.GoogleMapsPlaces _places = places.GoogleMapsPlaces(
+      apiKey: 'AIzaSyAojG0m2L8gnI4GFn5qR5VmqrDOLlCDNY4',
+      apiHeaders: await const header.GoogleApiHeaders().getHeaders(),
+    );
+    places.PlacesDetailsResponse detail =
+        await _places.getDetailsByPlaceId(p.placeId!);
+// detail will get place details that user chose from Prediction search
+    final lat = detail.result.geometry!.location.lat;
+    final lng = detail.result.geometry!.location.lng;
+    _markers.clear(); //clear old marker and set new one
+    final marker = Marker(
+      markerId: const MarkerId('deliveryMarker'),
+      position: LatLng(lat, lng),
+      infoWindow: const InfoWindow(
+        title: '',
+      ),
+    );
+    setState(() {
+      _markers['myLocation'] = marker;
+      _controller?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: LatLng(lat, lng), zoom: 15),
+        ),
+      );
+    });
   }
 }
