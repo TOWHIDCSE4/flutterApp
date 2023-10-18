@@ -1,15 +1,22 @@
+import 'dart:developer';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_google_places/flutter_google_places.dart' as loc;
+import 'package:get/get.dart';
 import 'package:google_api_headers/google_api_headers.dart' as header;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart' as places;
 
 import 'direction_model.dart';
 import 'direction_repository.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+  const MapScreen({
+    Key? key,
+    required this.selectedAddress,
+  }) : super(key: key);
+  final Function(String) selectedAddress;
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -27,6 +34,7 @@ class _MapScreenState extends State<MapScreen> {
   Directions? _info;
   final Map<String, Marker> _markers = {};
   GoogleMapController? _controller;
+  final TextEditingController locationController = TextEditingController();
 
   @override
   void dispose() {
@@ -41,11 +49,11 @@ class _MapScreenState extends State<MapScreen> {
         centerTitle: false,
         title: const Text('Google Maps'),
         actions: [
-          if (_origin == null || _destination == null)
-            IconButton(
-              onPressed: _handleSearch,
-              icon: const Icon(Icons.search),
-            ),
+          // if (_origin == null || _destination == null)
+          //   IconButton(
+          //     onPressed: _handleSearch,
+          //     icon: const Icon(Icons.search),
+          //   ),
           if (_origin != null)
             TextButton(
               onPressed: () => _googleMapController?.animateCamera(
@@ -107,6 +115,29 @@ class _MapScreenState extends State<MapScreen> {
             },
             onLongPress: _addMarker,
           ),
+          Positioned(
+              top: 20,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white.withOpacity(.8),
+                ),
+                width: 300,
+                child: TextField(
+                  controller: locationController,
+                  onTap: _handleSearch,
+
+                  keyboardType: TextInputType.text,
+
+                  decoration: const InputDecoration(
+                      hintText: "Enter the location",
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)))),
+                ),
+
+    )),
           if (_info != null)
             Positioned(
               top: 20.0,
@@ -190,7 +221,7 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _handleSearch() async {
     places.Prediction? p = await loc.PlacesAutocomplete.show(
         context: context,
-        apiKey: 'AIzaSyAojG0m2L8gnI4GFn5qR5VmqrDOLlCDNY4',
+        apiKey: 'AIzaSyAqTbnMzItUekvEqmF8VmF1PXrqNKoFsDQ',
         onError: onError, // call the onError function below
         mode: loc.Mode.overlay,
         language: 'en', //you can set any language for search
@@ -205,6 +236,12 @@ class _MapScreenState extends State<MapScreen> {
         );
 
     displayPrediction(p!);
+    String address =  p.description.toString();
+    locationController.text = address;
+    Future.delayed(const Duration(seconds: 1), () {
+      Get.back();
+      widget.selectedAddress(address);
+    });
   }
 
   void onError(places.PlacesAutocompleteResponse response) {
@@ -222,7 +259,7 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> displayPrediction(places.Prediction p) async {
     places.GoogleMapsPlaces _places = places.GoogleMapsPlaces(
-      apiKey: 'AIzaSyAojG0m2L8gnI4GFn5qR5VmqrDOLlCDNY4',
+      apiKey: 'AIzaSyAqTbnMzItUekvEqmF8VmF1PXrqNKoFsDQ',
       apiHeaders: await const header.GoogleApiHeaders().getHeaders(),
     );
     places.PlacesDetailsResponse detail =

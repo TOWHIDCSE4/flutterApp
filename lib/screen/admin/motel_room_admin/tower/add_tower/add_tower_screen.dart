@@ -172,7 +172,11 @@ class AddTowerScreen extends StatelessWidget {
                                 alignment: Alignment.centerRight,
                                 child: IconButton(
                                   onPressed: () {
-                                    Get.to(() => const MapScreen());
+                                    Get.to(() => MapScreen(
+                                      selectedAddress: (selectedAddress) {
+                                        controller.addressTextEditingController.text = selectedAddress;
+                                      },
+                                    ));
                                   },
                                   icon: const Icon(Icons.location_pin),
                                   color: AppColor.primaryColor,
