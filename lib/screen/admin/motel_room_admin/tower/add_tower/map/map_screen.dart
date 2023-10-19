@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places/flutter_google_places.dart' as loc;
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:gohomy/const/color.dart';
 import 'package:google_api_headers/google_api_headers.dart' as header;
@@ -34,8 +35,9 @@ class _MapScreenState extends State<MapScreen> {
   Marker? _destination;
   Directions? _info;
   final Map<String, Marker> _markers = {};
-  GoogleMapController? _controller;
+  // GoogleMapController? _controller;
   final TextEditingController locationController = TextEditingController();
+  bool isVisibleConfirmBtn = false;
 
   @override
   void dispose() {
@@ -67,7 +69,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
               style: TextButton.styleFrom(
-                primary: Colors.green,
+                foregroundColor: Colors.green,
                 textStyle: const TextStyle(fontWeight: FontWeight.w600),
               ),
               child: const Text('ORIGIN'),
@@ -84,7 +86,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
               style: TextButton.styleFrom(
-                primary: Colors.blue,
+                foregroundColor: Colors.blue,
                 textStyle: const TextStyle(fontWeight: FontWeight.w600),
               ),
               child: const Text('DEST'),
@@ -100,9 +102,9 @@ class _MapScreenState extends State<MapScreen> {
             initialCameraPosition: _initialCameraPosition,
             onMapCreated: (controller) => _googleMapController = controller,
             markers: {
-              if (_markers['myLocation']!= null) _markers['myLocation']!,
+              if (_markers['myLocation'] != null) _markers['myLocation']!,
               if (_origin != null) _origin!,
-              if (_destination != null) _destination!,              
+              if (_destination != null) _destination!,
             },
             polylines: {
               if (_info != null)
@@ -116,32 +118,34 @@ class _MapScreenState extends State<MapScreen> {
                 ),
             },
             onLongPress: _addMarker,
+            onTap: onTapMap,
           ),
           Positioned(
               child: Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white.withOpacity(.8),
-                  ),
-                  width: 300,
-                  child: TextField(
-                    controller: locationController,
-                    onTap: _handleSearch,
-              
-                    keyboardType: TextInputType.text,
-                    textAlign: TextAlign.center,
-                    decoration: const InputDecoration(
-                        hintText: "Enter the location",
-                        hintStyle: TextStyle(color: AppColor.dark0, fontSize: 18, fontWeight: FontWeight.w500),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10))),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  ),
-              
-                  ),
-              )),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white.withOpacity(.8),
+              ),
+              width: 300,
+              child: TextField(
+                controller: locationController,
+                onTap: _handleSearch,
+                keyboardType: TextInputType.text,
+                textAlign: TextAlign.center,
+                decoration: const InputDecoration(
+                    hintText: "Enter the location",
+                    hintStyle: TextStyle(
+                        color: AppColor.dark0,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)))),
+              ),
+            ),
+          )),
           if (_info != null)
             Positioned(
               top: 20.0,
@@ -170,22 +174,75 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
             ),
+          Positioned(
+            top: 10,
+            right: 10,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.black45,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                onPressed: () {
+                  _googleMapController?.animateCamera(
+                    _info != null
+                        ? CameraUpdate.newLatLngBounds(_info!.bounds, 100.0)
+                        : CameraUpdate.newCameraPosition(
+                            _initialCameraPosition),
+                  );
+                },
+                color: Theme.of(context).primaryColor,
+                icon: const Icon(
+                  Icons.location_searching,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.black,
-        onPressed: () => _googleMapController?.animateCamera(
-          _info != null
-              ? CameraUpdate.newLatLngBounds(_info!.bounds, 100.0)
-              : CameraUpdate.newCameraPosition(_initialCameraPosition),
-        ),
-        child: const Icon(Icons.center_focus_strong),
-      ),
+      floatingActionButton: isVisibleConfirmBtn ? ElevatedButton(
+        onPressed: () {
+          Get.back();
+          widget.selectedAddress(locationController.text);
+        },
+        child: const Text('confirm'),
+      ) : null,
     );
   }
 
+  Future<void> onTapMap(info) async {
+    final marker = Marker(
+      markerId: const MarkerId('deliveryMarker'),
+      position: LatLng(info.latitude, info.longitude),
+      infoWindow: const InfoWindow(
+        title: '',
+      ),
+    );
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(info.latitude, info.longitude);
+    setState(() {
+      _markers.clear(); //clear old marker and set new one
+      _origin = null;
+      _destination = null;
+      _info = null;
+      _markers['myLocation'] = marker;
+      _googleMapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+              target: LatLng(info.latitude, info.longitude), zoom: 15),
+        ),
+      );
+      isVisibleConfirmBtn = true;
+    });
+    locationController.text = placemarks.map((e) => e.street).toString();
+  }
+
   void _addMarker(LatLng pos) async {
+    setState(() {
+      _markers.clear();
+      isVisibleConfirmBtn = false;
+    });
     if (_origin == null || (_origin != null && _destination != null)) {
       // Origin is not set OR Origin/Destination are both set
       // Set origin
@@ -242,12 +299,8 @@ class _MapScreenState extends State<MapScreen> {
         );
 
     displayPrediction(p!);
-    String address =  p.description.toString();
+    String address = p.description.toString();
     locationController.text = address;
-    Future.delayed(const Duration(seconds: 1), () {
-      // Get.back();
-      widget.selectedAddress(address);
-    });
   }
 
   void onError(places.PlacesAutocompleteResponse response) {
@@ -274,6 +327,8 @@ class _MapScreenState extends State<MapScreen> {
     final lat = detail.result.geometry!.location.lat;
     final lng = detail.result.geometry!.location.lng;
     _markers.clear(); //clear old marker and set new one
+    _origin = null;
+    _destination = null;
     final marker = Marker(
       markerId: const MarkerId('deliveryMarker'),
       position: LatLng(lat, lng),
@@ -283,11 +338,12 @@ class _MapScreenState extends State<MapScreen> {
     );
     setState(() {
       _markers['myLocation'] = marker;
-      _controller?.animateCamera(
+      _googleMapController?.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(target: LatLng(lat, lng), zoom: 15),
         ),
       );
+      isVisibleConfirmBtn = true;
     });
   }
 }
