@@ -4,6 +4,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places/flutter_google_places.dart' as loc;
 import 'package:get/get.dart';
+import 'package:gohomy/const/color.dart';
 import 'package:google_api_headers/google_api_headers.dart' as header;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart' as places;
@@ -24,7 +25,7 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   static const _initialCameraPosition = CameraPosition(
-    target: LatLng(37.773972, -122.431297),
+    target: LatLng(21.0278, 105.2342),
     zoom: 11.5,
   );
 
@@ -99,8 +100,9 @@ class _MapScreenState extends State<MapScreen> {
             initialCameraPosition: _initialCameraPosition,
             onMapCreated: (controller) => _googleMapController = controller,
             markers: {
+              if (_markers['myLocation']!= null) _markers['myLocation']!,
               if (_origin != null) _origin!,
-              if (_destination != null) _destination!
+              if (_destination != null) _destination!,              
             },
             polylines: {
               if (_info != null)
@@ -116,28 +118,30 @@ class _MapScreenState extends State<MapScreen> {
             onLongPress: _addMarker,
           ),
           Positioned(
-              top: 20,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white.withOpacity(.8),
-                ),
-                width: 300,
-                child: TextField(
-                  controller: locationController,
-                  onTap: _handleSearch,
-
-                  keyboardType: TextInputType.text,
-
-                  decoration: const InputDecoration(
-                      hintText: "Enter the location",
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)))),
-                ),
-
-    )),
+              child: Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white.withOpacity(.8),
+                  ),
+                  width: 300,
+                  child: TextField(
+                    controller: locationController,
+                    onTap: _handleSearch,
+              
+                    keyboardType: TextInputType.text,
+                    textAlign: TextAlign.center,
+                    decoration: const InputDecoration(
+                        hintText: "Enter the location",
+                        hintStyle: TextStyle(color: AppColor.dark0, fontSize: 18, fontWeight: FontWeight.w500),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10))),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)))),
+                  ),
+              
+                  ),
+              )),
           if (_info != null)
             Positioned(
               top: 20.0,
@@ -223,15 +227,17 @@ class _MapScreenState extends State<MapScreen> {
         context: context,
         apiKey: 'AIzaSyAqTbnMzItUekvEqmF8VmF1PXrqNKoFsDQ',
         onError: onError, // call the onError function below
-        mode: loc.Mode.overlay,
+        mode: loc.Mode.fullscreen,
         language: 'en', //you can set any language for search
         strictbounds: false,
         types: [],
-        decoration: InputDecoration(
-            hintText: 'search',
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: const BorderSide(color: Colors.white))),
+        decoration: const InputDecoration(
+          hintText: 'search',
+          // focusedBorder: OutlineInputBorder(
+          //   borderRadius: BorderRadius.circular(20),
+          //   borderSide: const BorderSide(color: Colors.white),
+          // ),
+        ),
         components: [] // you can determine search for just one country
         );
 
@@ -239,7 +245,7 @@ class _MapScreenState extends State<MapScreen> {
     String address =  p.description.toString();
     locationController.text = address;
     Future.delayed(const Duration(seconds: 1), () {
-      Get.back();
+      // Get.back();
       widget.selectedAddress(address);
     });
   }
