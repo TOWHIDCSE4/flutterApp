@@ -121,31 +121,31 @@ class _MapScreenState extends State<MapScreen> {
             onTap: onTapMap,
           ),
           Positioned(
-              child: Center(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white.withOpacity(.8),
-              ),
-              width: 300,
-              child: TextField(
-                controller: locationController,
-                onTap: _handleSearch,
-                keyboardType: TextInputType.text,
-                textAlign: TextAlign.center,
-                decoration: const InputDecoration(
-                    hintText: "Enter the location",
-                    hintStyle: TextStyle(
-                        color: AppColor.dark0,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)))),
-              ),
-            ),
-          )),
+            top: 10,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white.withOpacity(.8),
+                ),
+                width: 300,
+                child: TextField(
+                  controller: locationController,
+                  readOnly: true,
+                  onTap: _handleSearch,
+                  keyboardType: TextInputType.text,
+                  textAlign: TextAlign.center,
+                  decoration: const InputDecoration(
+                      hintText: "Enter the location",
+                      hintStyle: TextStyle(
+                          color: AppColor.dark0,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)))),
+                ),
+              )),
           if (_info != null)
             Positioned(
               top: 20.0,
@@ -175,26 +175,30 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
           Positioned(
-            top: 10,
-            right: 10,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.black45,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                onPressed: () {
-                  _googleMapController?.animateCamera(
-                    _info != null
-                        ? CameraUpdate.newLatLngBounds(_info!.bounds, 100.0)
-                        : CameraUpdate.newCameraPosition(
-                            _initialCameraPosition),
-                  );
-                },
-                color: Theme.of(context).primaryColor,
-                icon: const Icon(
-                  Icons.location_searching,
-                  color: Colors.white,
+            child: Center(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.black45,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      debugPrint("click");
+                      locationController.clear();
+                    });
+                    _googleMapController?.animateCamera(
+                      _info != null
+                          ? CameraUpdate.newLatLngBounds(_info!.bounds, 100.0)
+                          : CameraUpdate.newCameraPosition(
+                              _initialCameraPosition),
+                    );
+                  },
+                  color: Theme.of(context).primaryColor,
+                  icon: const Icon(
+                    Icons.location_searching,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
