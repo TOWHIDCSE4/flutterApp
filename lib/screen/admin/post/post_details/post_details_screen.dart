@@ -6,8 +6,10 @@ import 'package:gohomy/components/arlert/saha_alert.dart';
 import 'package:gohomy/components/loading/loading_full_screen.dart';
 import 'package:gohomy/screen/admin/post/post_details/post_details_controller.dart';
 import 'package:gohomy/screen/find_room/find_room_post/post_find_room_controller.dart';
+import 'package:gohomy/utils/map_navigation_utils.dart';
 import 'package:gohomy/utils/share.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../components/dialog/dialog.dart';
@@ -40,7 +42,7 @@ class PostDetailsScreen extends StatelessWidget {
     this.isVisibleShareIcon = false,
     this.isFindRoomPost = false,
   }) {
-    if(isFindRoomPost == true) {
+    if (isFindRoomPost == true) {
       controller = PostFindRoomController(postFindRoomId: id);
     }
     postDetailsController = PostDetailsController(id: id);
@@ -336,102 +338,102 @@ class PostDetailsScreen extends StatelessWidget {
               icon: onTapEdit == null
                   ? const Icon(Icons.chat)
                   : const Icon(Icons.edit)),
-                  
-          !isVisibleShareIcon ? GestureDetector(
-            onTap: () {
-              SahaDialogApp.showDialogYesNo(
-                  mess: "Bạn có chắc muốn xoá bài đăng này",
-                  onClose: () {},
-                  onOK: () async {
-                    await postDetailsController.deleteMotelPost();
-                    Get.back();
-                  });
-            },
-            child: Container(
-              margin: const EdgeInsets.all(10),
-              child: const Icon(
-                FontAwesomeIcons.trashCan,
-              ),
-            ),
-          ) :
-          IconButton(
-              onPressed: () {
-                showModalBottomSheet<void>(
-                  context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10.0),
-                      topRight: Radius.circular(10.0),
+          !isVisibleShareIcon
+              ? GestureDetector(
+                  onTap: () {
+                    SahaDialogApp.showDialogYesNo(
+                        mess: "Bạn có chắc muốn xoá bài đăng này",
+                        onClose: () {},
+                        onOK: () async {
+                          await postDetailsController.deleteMotelPost();
+                          Get.back();
+                        });
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(10),
+                    child: const Icon(
+                      FontAwesomeIcons.trashCan,
                     ),
                   ),
-                  builder: (BuildContext context) => SafeArea(
-                    child: Container(
-                      height: 200,
-                      padding: const EdgeInsets.only(left: 5),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          TextButton(
-                            onPressed: () async {
-                              Navigator.pop(context);
-                              await controller.buildLink();
-                              if (controller.linkPost == null) {
-                                SahaAlert.showError(
-                                    message:
-                                        "Có lỗi xảy ra, vui lòng thử lại sau");
-                                return;
-                              }
-                              shareLink(controller.linkPost!);
-                            },
-                            child: const Align(
-                              alignment: AlignmentDirectional.centerStart,
-                              child: Text(
-                                'Chia sẻ link',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              Navigator.pop(context);
-                              await controller.buildLink();
-                              if (controller.linkPost == null) {
-                                SahaAlert.showError(
-                                    message:
-                                        "Có lỗi xảy ra, vui lòng thử lại sau");
-                                return;
-                              }
-
-                              shareQr(controller.linkPost!);
-                            },
-                            child: const Align(
-                              alignment: AlignmentDirectional.centerStart,
-                              child: Text(
-                                'Chia sẻ mã QR',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Align(
-                              alignment: AlignmentDirectional.centerStart,
-                              child: Text(
-                                'Đóng',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                          ),
-                        ],
+                )
+              : IconButton(
+                  onPressed: () {
+                    showModalBottomSheet<void>(
+                      context: context,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(10.0),
+                          topRight: Radius.circular(10.0),
+                        ),
                       ),
-                    ),
-                  ),
-                );
-                // SharePost().sharePostImage(
-                //     roomInformationController.roomPost.value.images ?? [],
-                //     roomInformationController.roomPost.value.title ?? "");
-              },
-              icon: const Icon(Icons.share_rounded)),
+                      builder: (BuildContext context) => SafeArea(
+                        child: Container(
+                          height: 200,
+                          padding: const EdgeInsets.only(left: 5),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              TextButton(
+                                onPressed: () async {
+                                  Navigator.pop(context);
+                                  await controller.buildLink();
+                                  if (controller.linkPost == null) {
+                                    SahaAlert.showError(
+                                        message:
+                                            "Có lỗi xảy ra, vui lòng thử lại sau");
+                                    return;
+                                  }
+                                  shareLink(controller.linkPost!);
+                                },
+                                child: const Align(
+                                  alignment: AlignmentDirectional.centerStart,
+                                  child: Text(
+                                    'Chia sẻ link',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  Navigator.pop(context);
+                                  await controller.buildLink();
+                                  if (controller.linkPost == null) {
+                                    SahaAlert.showError(
+                                        message:
+                                            "Có lỗi xảy ra, vui lòng thử lại sau");
+                                    return;
+                                  }
+
+                                  shareQr(controller.linkPost!);
+                                },
+                                child: const Align(
+                                  alignment: AlignmentDirectional.centerStart,
+                                  child: Text(
+                                    'Chia sẻ mã QR',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Align(
+                                  alignment: AlignmentDirectional.centerStart,
+                                  child: Text(
+                                    'Đóng',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                    // SharePost().sharePostImage(
+                    //     roomInformationController.roomPost.value.images ?? [],
+                    //     roomInformationController.roomPost.value.title ?? "");
+                  },
+                  icon: const Icon(Icons.share_rounded)),
         ],
       ),
       body: Obx(
@@ -598,9 +600,23 @@ class PostDetailsScreen extends StatelessWidget {
                                       ),
                                       Row(
                                         children: [
-                                          const Icon(
-                                            Icons.location_on_outlined,
-                                            color: Colors.grey,
+                                          InkWell(
+                                            onTap: () {
+                                              MapNavigationUtils()
+                                                  .openGoogleMaps(
+                                                '${postDetailsController.motelPost.value.addressDetail ?? ""}'
+                                                '${postDetailsController.motelPost.value.addressDetail == null ? "" : ", "}'
+                                                '${postDetailsController.motelPost.value.wardsName ?? ""}'
+                                                '${postDetailsController.motelPost.value.wardsName != null ? ", " : ""}'
+                                                '${postDetailsController.motelPost.value.districtName ?? ""}'
+                                                '${postDetailsController.motelPost.value.districtName != null ? ", " : ""}'
+                                                '${postDetailsController.motelPost.value.provinceName ?? ""}',
+                                              );
+                                            },
+                                            child: const Icon(
+                                              Icons.location_on_outlined,
+                                              color: Colors.blue,
+                                            ),
                                           ),
                                           const SizedBox(
                                             width: 5,
@@ -1977,9 +1993,9 @@ class PostDetailsScreen extends StatelessWidget {
                 color: motelRoom.isHidden == 0
                     ? Colors.grey.withOpacity(0.1)
                     : motelRoom.id ==
-                    postDetailsController.motelRoomChoose.value.id
-                    ? Colors.white
-                    : Colors.grey[200],
+                            postDetailsController.motelRoomChoose.value.id
+                        ? Colors.white
+                        : Colors.grey[200],
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: motelRoom.id ==
                         postDetailsController.motelRoomChoose.value.id

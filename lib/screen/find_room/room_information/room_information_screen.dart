@@ -9,6 +9,7 @@ import 'package:gohomy/components/dialog/dialog.dart';
 import 'package:gohomy/components/loading/loading_full_screen.dart';
 import 'package:gohomy/components/widget/image/images.dart';
 import 'package:gohomy/components/widget/post_item/post_item.dart';
+import 'package:gohomy/utils/map_navigation_utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -460,29 +461,49 @@ class _RoomInformationScreenState extends State<RoomInformationScreen> {
                                             const SizedBox(
                                               height: 10,
                                             ),
-                                            Row(
-                                              children: [
-                                                const Icon(
-                                                  Icons.location_on_outlined,
-                                                  color: Colors.grey,
-                                                ),
-                                                const SizedBox(
-                                                  width: 5,
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    dataAppController.isLogin
-                                                                .value !=
-                                                            true
-                                                        ? "${roomInformationController.roomPost.value.districtName ?? ""}${roomInformationController.roomPost.value.districtName != null ? ", " : ""}${roomInformationController.roomPost.value.provinceName ?? ""}"
-                                                        : '${roomInformationController.roomPost.value.addressDetail ?? ""}${roomInformationController.roomPost.value.addressDetail == null ? "" : ", "}${roomInformationController.roomPost.value.wardsName ?? ""}${roomInformationController.roomPost.value.wardsName != null ? ", " : ""}${roomInformationController.roomPost.value.districtName ?? ""}${roomInformationController.roomPost.value.districtName != null ? ", " : ""}${roomInformationController.roomPost.value.provinceName ?? ""}',
-                                                    maxLines: 2,
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
+                                            InkWell(
+                                              onTap: () {
+                                                MapNavigationUtils()
+                                                    .openGoogleMaps(
+                                                  dataAppController
+                                                              .isLogin.value !=
+                                                          true
+                                                      ? "${roomInformationController.roomPost.value.districtName ?? ""}"
+                                                          "${roomInformationController.roomPost.value.districtName != null ? ", " : ""}"
+                                                          "${roomInformationController.roomPost.value.provinceName ?? ""}"
+                                                      : '${roomInformationController.roomPost.value.addressDetail ?? ""}'
+                                                          '${roomInformationController.roomPost.value.addressDetail == null ? "" : ", "}'
+                                                          '${roomInformationController.roomPost.value.wardsName ?? ""}'
+                                                          '${roomInformationController.roomPost.value.wardsName != null ? ", " : ""}'
+                                                          '${roomInformationController.roomPost.value.districtName ?? ""}'
+                                                          '${roomInformationController.roomPost.value.districtName != null ? ", " : ""}'
+                                                          '${roomInformationController.roomPost.value.provinceName ?? ""}',
+                                                );
+                                              },
+                                              child: Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.location_on_outlined,
+                                                    color: Colors.blue,
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 5,
+                                                  ),
+                                                  Expanded(
+                                                    child: Text(
+                                                      dataAppController.isLogin
+                                                                  .value !=
+                                                              true
+                                                          ? "${roomInformationController.roomPost.value.districtName ?? ""}${roomInformationController.roomPost.value.districtName != null ? ", " : ""}${roomInformationController.roomPost.value.provinceName ?? ""}"
+                                                          : '${roomInformationController.roomPost.value.addressDetail ?? ""}${roomInformationController.roomPost.value.addressDetail == null ? "" : ", "}${roomInformationController.roomPost.value.wardsName ?? ""}${roomInformationController.roomPost.value.wardsName != null ? ", " : ""}${roomInformationController.roomPost.value.districtName ?? ""}${roomInformationController.roomPost.value.districtName != null ? ", " : ""}${roomInformationController.roomPost.value.provinceName ?? ""}',
+                                                      maxLines: 2,
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                             const SizedBox(
                                               height: 10,
@@ -813,18 +834,27 @@ class _RoomInformationScreenState extends State<RoomInformationScreen> {
                                           Row(
                                             children: [
                                               Text(
-                                                roomInformationController.roomPost
-                                                        .value.user?.name ??
+                                                roomInformationController
+                                                        .roomPost
+                                                        .value
+                                                        .user
+                                                        ?.name ??
                                                     "",
                                                 style: const TextStyle(
                                                     fontSize: 16,
-                                                    fontWeight: FontWeight.bold),
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                               ),
-                                              const SizedBox(
-                                                width: 5
-                                              ),
-                                              if(roomInformationController.roomPost.value.user?.cmndNumber != null)
-                                                const Icon(Icons.check_circle, color: Colors.blueAccent, size: 20)
+                                              const SizedBox(width: 5),
+                                              if (roomInformationController
+                                                      .roomPost
+                                                      .value
+                                                      .user
+                                                      ?.cmndNumber !=
+                                                  null)
+                                                const Icon(Icons.check_circle,
+                                                    color: Colors.blueAccent,
+                                                    size: 20)
                                             ],
                                           ),
                                           const SizedBox(
@@ -2068,7 +2098,7 @@ class _RoomInformationScreenState extends State<RoomInformationScreen> {
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () {
-          if(motelRoom.isHidden != 1) {
+          if (motelRoom.isHidden != 1) {
             roomInformationController.motelRoomChoose.value = motelRoom;
           }
         },
