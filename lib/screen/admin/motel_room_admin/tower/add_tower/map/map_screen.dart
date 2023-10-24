@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places/flutter_google_places.dart' as loc;
@@ -121,7 +119,7 @@ class _MapScreenState extends State<MapScreen> {
             onTap: onTapMap,
           ),
           Positioned(
-            top: 10,
+              top: 10,
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
@@ -205,13 +203,20 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ],
       ),
-      floatingActionButton: isVisibleConfirmBtn ? ElevatedButton(
-        onPressed: () {
-          Get.back();
-          widget.selectedAddress(locationController.text);
-        },
-        child: const Text('confirm'),
-      ) : null,
+      floatingActionButton: isVisibleConfirmBtn
+          ? ElevatedButton(
+              onPressed: () {
+                Get.back();
+
+                /// Remove parentheses from address
+                String address = locationController.text;
+                address = address.substring(1, address.length - 1);
+
+                widget.selectedAddress(address);
+              },
+              child: const Text('confirm'),
+            )
+          : null,
     );
   }
 
