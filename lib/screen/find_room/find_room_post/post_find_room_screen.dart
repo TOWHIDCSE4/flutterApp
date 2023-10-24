@@ -33,10 +33,6 @@ class PostFindRoomScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String getAddress = '${controller.post.value.wardsName ?? ""} - '
-        '${controller.post.value.districtName ?? ''} - '
-        '${controller.post.value.provinceName ?? ''}';
-
     return Scaffold(
       appBar: SahaAppBar(
         titleText: "Tìm phòng",
@@ -162,7 +158,11 @@ class PostFindRoomScreen extends StatelessWidget {
                           ),
                           InkWell(
                             onTap: () {
-                              MapNavigationUtils().openGoogleMaps(getAddress);
+                              MapNavigationUtils().openGoogleMaps(
+                                '${controller.post.value.wardsName ?? ""} - '
+                                '${controller.post.value.districtName ?? ''} - '
+                                '${controller.post.value.provinceName ?? ''}',
+                              );
                             },
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,8 +171,8 @@ class PostFindRoomScreen extends StatelessWidget {
                                   width: 40,
                                   height: 40,
                                   child: Icon(
-                                    Icons.location_on,
-                                    color: Colors.deepOrange,
+                                    Icons.location_on_outlined,
+                                    color: Colors.blue,
                                   ),
                                 ),
                                 const SizedBox(
@@ -180,7 +180,9 @@ class PostFindRoomScreen extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    getAddress,
+                                    '${controller.post.value.wardsName ?? ""} - '
+                                    '${controller.post.value.districtName ?? ''} - '
+                                    '${controller.post.value.provinceName ?? ''}',
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ),

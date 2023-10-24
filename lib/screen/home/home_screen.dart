@@ -11,7 +11,6 @@ import 'package:gohomy/components/dialog/dialog.dart';
 import 'package:gohomy/components/widget/post_item/post_item.dart';
 import 'package:gohomy/model/admin_discover.dart';
 import 'package:gohomy/screen/data_app_controller.dart';
-import 'package:gohomy/utils/map_navigation_utils.dart';
 import 'package:gohomy/utils/string_utils.dart';
 import 'package:gohomy/utils/user_info.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1342,32 +1341,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  InkWell(
-                    onTap: () {
-                      MapNavigationUtils().openGoogleMaps(getAddress);
-                    },
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.location_on,
-                          size: 14,
-                          color: Colors.grey,
-                        ),
-                        Expanded(
-                          child: Text(
-                            getAddress,
-                            maxLines: 2,
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
-                              height: 1.2,
-                              letterSpacing: 0.1,
-                            ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.location_on,
+                        size: 14,
+                        color: Colors.grey,
+                      ),
+                      Expanded(
+                        child: Text(
+                          getAddress,
+                          maxLines: 2,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                            height: 1.2,
+                            letterSpacing: 0.1,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   )
                 ],
               ),

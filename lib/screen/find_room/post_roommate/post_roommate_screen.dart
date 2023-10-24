@@ -292,7 +292,7 @@ class PostRoommateScreen extends StatelessWidget {
                                             children: [
                                               const Icon(
                                                 Icons.location_on_outlined,
-                                                color: Colors.grey,
+                                                color: Colors.blue,
                                               ),
                                               const SizedBox(
                                                 width: 5,
