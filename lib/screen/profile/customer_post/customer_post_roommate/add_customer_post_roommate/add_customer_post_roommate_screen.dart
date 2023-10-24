@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
 import 'package:gohomy/components/appbar/saha_appbar.dart';
+import 'package:gohomy/const/color.dart';
+import 'package:gohomy/screen/admin/motel_room_admin/tower/add_tower/map/map_screen.dart';
 import 'package:gohomy/screen/profile/customer_post/customer_post_roommate/add_customer_post_roommate/add_customer_post_roommate_controller.dart';
 import 'package:pattern_formatter/numeric_formatter.dart';
-import 'package:video_compress/video_compress.dart';
 
 import '../../../../../components/arlert/saha_alert.dart';
 import '../../../../../components/button/saha_button.dart';
@@ -22,10 +22,10 @@ import '../../../../../const/type_image.dart';
 import '../../../../../model/image_assset.dart';
 import '../../../../../model/service.dart';
 import '../../../../../utils/string_utils.dart';
-import '../../../../owner/choose_room/choose_room_screen.dart';
 
 class AddCustomerPostRoommateScreen extends StatelessWidget {
-  AddCustomerPostRoommateScreen({super.key, this.idPostRoommate,this.isAdmin}) {
+  AddCustomerPostRoommateScreen(
+      {super.key, this.idPostRoommate, this.isAdmin}) {
     controller =
         AddCustomerPostRoommateController(idPostRoommate: idPostRoommate);
   }
@@ -91,887 +91,873 @@ class AddCustomerPostRoommateScreen extends StatelessWidget {
                         hintText: "Nhập số người tìm ghép",
                       ),
                       InkWell(
-                        onTap: () {
-
-                        },
+                        onTap: () {},
                         child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                  padding: const EdgeInsets.only(
-                                      top: 15,
-                                      left: 10,
-                                      right: 10,
-                                      bottom: 10),
-                                  child: Image.asset(
-                                    'assets/icon_host/loai-phong.png',
-                                    width: Get.width / 3.5,
-                                  )),
-                              Padding(
-                                  padding: const EdgeInsets.only(
-                                      right: 15.0, left: 15),
-                                  child: Wrap(
-                                    children: [
-                                      itemTypeRoom(
-                                          type: MOTEL, title: "Trọ thường"),
-                                      itemTypeRoom(
-                                          type: MOTEL_COMPOUND,
-                                          title: "Nguyên căn"),
-                                      itemTypeRoom(
-                                          type: HOME, title: "Chung cư"),
-                                      itemTypeRoom(
-                                          type: VILLA,
-                                          title: "Chung cư mini"),
-                                      itemTypeRoom(
-                                          type: HOMESTAY, title: "Homestay"),
-                                    ],
-                                  )),
-                              Obx(
-                                () => Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: SelectImages(
-                                    maxImage: 10,
-                                    type: MO_POST_FILES_FOLDER,
-                                    title: 'Ảnh phòng trọ',
-                                    subTitle: 'Tối đa 10 hình',
-                                    onUpload: () {
-                                      controller.doneUploadImage.value =
-                                          false;
-                                    },
-                                    images: controller.listImages.toList(),
-                                    doneUpload: (List<ImageData> listImages) {
-                                      print(
-                                          "done upload image ${listImages.length} images => ${listImages.toList().map((e) => e.linkImage).toList()}");
-                                      controller.listImages(listImages);
-                                      if ((listImages
-                                              .map((e) => e.linkImage ?? "x"))
-                                          .toList()
-                                          .contains('x')) {
-                                        SahaAlert.showError(
-                                            message: 'Lỗi ảnh');
-                                        return;
-                                      }
-                                      controller.postReq.value.images =
-                                          (listImages.map(
-                                                  (e) => e.linkImage ?? ""))
-                                              .toList();
-
-                                      controller.doneUploadImage.value = true;
-                                    },
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: Obx(
-                                  () => VideoPickerSingle(
-                                    linkVideo:
-                                        controller.postReq.value.linkVideo,
-                                    onChange: (File? file) async {
-                                      controller.file = file;
-                                      if (file == null) {
-                                        controller.postReq.value.linkVideo =
-                                            "";
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                              SahaDivide(),
-
-                              InkWell(
-                                onTap: () {
-                                  SahaDialogApp.showDialogAddressChoose(
-                                    hideAll: true,
-                                    accept: () {},
-                                    callback: (v) {
-                                      controller.locationProvince.value = v;
-                                      Get.back();
-                                      SahaDialogApp.showDialogAddressChoose(
-                                        hideAll: true,
-                                        accept: () {},
-                                        idProvince: controller
-                                            .locationProvince.value.id,
-                                        callback: (v) {
-                                          controller.locationDistrict.value =
-                                              v;
-                                          Get.back();
-                                          SahaDialogApp
-                                              .showDialogAddressChoose(
-                                            hideAll: true,
-                                            accept: () {},
-                                            idDistrict: controller
-                                                .locationDistrict.value.id,
-                                            callback: (v) {
-                                              controller.locationWard.value =
-                                                  v;
-                                              Get.back();
-                                              SahaDialogApp
-                                                  .showDialogInputNote(
-                                                      height: 50,
-                                                      confirm: (v) {
-                                                        if (v == null ||
-                                                            v == "") {
-                                                          SahaAlert
-                                                              .showToastMiddle(
-                                                                  message:
-                                                                      "Vui lòng nhập địa chỉ chi tiết");
-                                                        } else {
-                                                          var province =
-                                                              controller
-                                                                  .locationProvince;
-                                                          controller
-                                                                  .postReq
-                                                                  .value
-                                                                  .province =
-                                                              province
-                                                                  .value.id;
-                                                          var district =
-                                                              controller
-                                                                  .locationDistrict;
-                                                          controller
-                                                                  .postReq
-                                                                  .value
-                                                                  .district =
-                                                              district
-                                                                  .value.id;
-                                                          var ward = controller
-                                                              .locationWard;
-                                                          controller
-                                                                  .postReq
-                                                                  .value
-                                                                  .wards =
-                                                              ward.value.id;
-                                                          controller
-                                                              .postReq
-                                                              .value
-                                                              .addressDetail = v;
-
-                                                          controller.postReq
-                                                              .refresh();
-                                                          controller
-                                                                  .addressTextEditingController
-                                                                  .text =
-                                                              "${controller.postReq.value.addressDetail} - ${ward.value.name} - ${district.value.name} - ${province.value.name}";
-                                                        }
-                                                      },
-                                                      title:
-                                                          "Địa chỉ chi tiết",
-                                                      textInput: controller
-                                                              .postReq
-                                                              .value
-                                                              .addressDetail ??
-                                                          "");
-                                            },
-                                          );
-                                        },
-                                      );
-                                    },
-                                  );
-                                },
-                                child: SahaTextFieldNoBorder(
-                                  enabled: false,
-                                  labelText: "Địa chỉ",
-                                  textInputType: TextInputType.text,
-                                  controller:
-                                      controller.addressTextEditingController,
-                                  withAsterisk: true,
-                                  onChanged: (v) {
-                                    //addPostController.postReq.value.name = v;
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                                padding: const EdgeInsets.only(
+                                    top: 15, left: 10, right: 10, bottom: 10),
+                                child: Image.asset(
+                                  'assets/icon_host/loai-phong.png',
+                                  width: Get.width / 3.5,
+                                )),
+                            Padding(
+                                padding: const EdgeInsets.only(
+                                    right: 15.0, left: 15),
+                                child: Wrap(
+                                  children: [
+                                    itemTypeRoom(
+                                        type: MOTEL, title: "Trọ thường"),
+                                    itemTypeRoom(
+                                        type: MOTEL_COMPOUND,
+                                        title: "Nguyên căn"),
+                                    itemTypeRoom(type: HOME, title: "Chung cư"),
+                                    itemTypeRoom(
+                                        type: VILLA, title: "Chung cư mini"),
+                                    itemTypeRoom(
+                                        type: HOMESTAY, title: "Homestay"),
+                                  ],
+                                )),
+                            Obx(
+                              () => Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SelectImages(
+                                  maxImage: 10,
+                                  type: MO_POST_FILES_FOLDER,
+                                  title: 'Ảnh phòng trọ',
+                                  subTitle: 'Tối đa 10 hình',
+                                  onUpload: () {
+                                    controller.doneUploadImage.value = false;
                                   },
-                                  hintText: "Chọn địa chỉ",
-                                ),
-                              ),
-                              SahaDivide(),
-                              SahaTextFieldNoBorder(
-                                readOnly: false,
-                                withAsterisk: true,
-                                textInputType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                controller:
-                                    controller.numberTenantCurrent,
-                                onChanged: (v) {
-                                  controller.postReq.value.numberTenantCurrent =
-                                      int.parse(v!);
-                                },
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Không được để trống';
-                                  }
-                                  return null;
-                                },
-                                labelText: "Số người hiện tại",
-                                hintText: "Nhập số người hiện tại",
-                              ),
-                              SahaDivide(),
+                                  images: controller.listImages.toList(),
+                                  doneUpload: (List<ImageData> listImages) {
+                                    print(
+                                        "done upload image ${listImages.length} images => ${listImages.toList().map((e) => e.linkImage).toList()}");
+                                    controller.listImages(listImages);
+                                    if ((listImages
+                                            .map((e) => e.linkImage ?? "x"))
+                                        .toList()
+                                        .contains('x')) {
+                                      SahaAlert.showError(message: 'Lỗi ảnh');
+                                      return;
+                                    }
+                                    controller.postReq.value.images =
+                                        (listImages.map(
+                                            (e) => e.linkImage ?? "")).toList();
 
-                              SahaTextFieldNoBorder(
-                                readOnly: false,
-                                withAsterisk: true,
-                                textInputType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp('[0-9.,]+')),
-                                ],
-                                controller:
-                                    controller.areaTextEditingController,
-                                onChanged: (v) {
-                                  controller.postReq.value.area =
-                                      int.parse(v!);
-                                },
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Không được để trống';
-                                  }
-                                  return null;
-                                },
-                                labelText: "Diện tích (m²)",
-                                hintText: "Nhập diện tích",
-                              ),
-                              SahaDivide(),
-                              SahaTextFieldNoBorder(
-                                readOnly: false,
-                                textInputType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                controller: controller.quantityVehicleParked,
-                                onChanged: (v) {
-                                  controller.postReq.value
-                                      .quantityVehicleParked = int.parse(v!);
-                                },
-                                labelText: "Số chỗ để xe",
-                                hintText: "Nhập sô chỗ để xe",
-                              ),
-                              SahaDivide(),
-                              SahaTextFieldNoBorder(
-                                readOnly: false,
-                                withAsterisk: true,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                textInputType: TextInputType.number,
-                                controller: controller.numberFloor,
-                                onChanged: (v) {
-                                  controller.postReq.value.numberFloor =
-                                      int.parse(v!);
-                                },
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Không được để trống';
-                                  }
-                                  return null;
-                                },
-                                labelText: "Tầng",
-                                hintText: "Nhập số tầng",
-                              ),
-                              SahaDivide(),
-                              SahaTextFieldNoBorder(
-                                withAsterisk: true,
-                                textInputType: TextInputType.phone,
-                                controller: controller
-                                    .phoneNumberTextEditingController,
-                                onChanged: (v) {
-                                  controller.postReq.value.phoneNumber = v;
-                                },
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Không được để trống';
-                                  }
-                                  return null;
-                                },
-                                labelText: "Số điện thoại",
-                                hintText: "Nhập số điện thoại",
-                              ),
-                              SahaDivide(),
-                              Padding(
-                                padding: const EdgeInsets.all(
-                                  16,
+                                    controller.doneUploadImage.value = true;
+                                  },
                                 ),
-                                child: InkWell(
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: Obx(
+                                () => VideoPickerSingle(
+                                  linkVideo: controller.postReq.value.linkVideo,
+                                  onChange: (File? file) async {
+                                    controller.file = file;
+                                    if (file == null) {
+                                      controller.postReq.value.linkVideo = "";
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                            SahaDivide(),
+
+                            Stack(
+                              children: [
+                                InkWell(
                                   onTap: () {
-                                    SahaDialogApp.showDialogSex(
-                                      onChoose: (sex) {
-                                        controller.postReq.value.sex = sex;
-                                        controller.postReq.refresh();
+                                    SahaDialogApp.showDialogAddressChoose(
+                                      hideAll: true,
+                                      accept: () {},
+                                      callback: (v) {
+                                        controller.locationProvince.value = v;
+                                        Get.back();
+                                        SahaDialogApp.showDialogAddressChoose(
+                                          hideAll: true,
+                                          accept: () {},
+                                          idProvince: controller
+                                              .locationProvince.value.id,
+                                          callback: (v) {
+                                            controller.locationDistrict.value =
+                                                v;
+                                            Get.back();
+                                            SahaDialogApp
+                                                .showDialogAddressChoose(
+                                              hideAll: true,
+                                              accept: () {},
+                                              idDistrict: controller
+                                                  .locationDistrict.value.id,
+                                              callback: (v) {
+                                                controller.locationWard.value =
+                                                    v;
+                                                Get.back();
+                                                SahaDialogApp
+                                                    .showDialogInputNote(
+                                                        height: 50,
+                                                        confirm: (v) {
+                                                          if (v == null ||
+                                                              v == "") {
+                                                            SahaAlert
+                                                                .showToastMiddle(
+                                                                    message:
+                                                                        "Vui lòng nhập địa chỉ chi tiết");
+                                                          } else {
+                                                            var province =
+                                                                controller
+                                                                    .locationProvince;
+                                                            controller
+                                                                    .postReq
+                                                                    .value
+                                                                    .province =
+                                                                province
+                                                                    .value.id;
+                                                            var district =
+                                                                controller
+                                                                    .locationDistrict;
+                                                            controller
+                                                                    .postReq
+                                                                    .value
+                                                                    .district =
+                                                                district
+                                                                    .value.id;
+                                                            var ward = controller
+                                                                .locationWard;
+                                                            controller
+                                                                    .postReq
+                                                                    .value
+                                                                    .wards =
+                                                                ward.value.id;
+                                                            controller
+                                                                .postReq
+                                                                .value
+                                                                .addressDetail = v;
+
+                                                            controller.postReq
+                                                                .refresh();
+                                                            controller
+                                                                    .addressTextEditingController
+                                                                    .text =
+                                                                "${controller.postReq.value.addressDetail} - ${ward.value.name} - ${district.value.name} - ${province.value.name}";
+                                                          }
+                                                        },
+                                                        title:
+                                                            "Địa chỉ chi tiết",
+                                                        textInput: controller
+                                                                .postReq
+                                                                .value
+                                                                .addressDetail ??
+                                                            "");
+                                              },
+                                            );
+                                          },
+                                        );
                                       },
-                                      sex: controller.postReq.value.sex ?? 0,
                                     );
                                   },
-                                  child: Row(
-                                    children: [
-                                      const Text(
-                                        "Giới tính: ",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Obx(
-                                          () => Text(
-                                            controller.postReq.value.sex == 0
-                                                ? "Nam, nữ"
-                                                : controller.postReq.value
-                                                            .sex ==
-                                                        1
-                                                    ? "Nam"
-                                                    : controller.postReq.value
-                                                                .sex ==
-                                                            2
-                                                        ? "Nữ"
-                                                        : "Nam, nữ",
-                                            textAlign: TextAlign.end,
-                                          ),
-                                        ),
-                                      ),
-                                      const Icon(
-                                          Icons.keyboard_arrow_down_rounded)
-                                    ],
+                                  child: SahaTextFieldNoBorder(
+                                    enabled: false,
+                                    labelText: "Địa chỉ",
+                                    textInputType: TextInputType.text,
+                                    controller:
+                                        controller.addressTextEditingController,
+                                    withAsterisk: true,
+                                    onChanged: (v) {
+                                      //addPostController.postReq.value.name = v;
+                                    },
+                                    hintText: "Chọn địa chỉ",
                                   ),
                                 ),
-                              ),
-                              SahaDivide(),
+                                Positioned.fill(
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        Get.to(() => MapScreen(
+                                              selectedAddress:
+                                                  (selectedAddress) {
+                                                controller
+                                                    .addressTextEditingController
+                                                    .text = selectedAddress;
+                                              },
+                                            ));
+                                      },
+                                      icon: const Icon(Icons.location_pin),
+                                      color: AppColor.primaryColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SahaDivide(),
+                            SahaTextFieldNoBorder(
+                              readOnly: false,
+                              withAsterisk: true,
+                              textInputType: TextInputType.number,
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              controller: controller.numberTenantCurrent,
+                              onChanged: (v) {
+                                controller.postReq.value.numberTenantCurrent =
+                                    int.parse(v!);
+                              },
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Không được để trống';
+                                }
+                                return null;
+                              },
+                              labelText: "Số người hiện tại",
+                              hintText: "Nhập số người hiện tại",
+                            ),
+                            SahaDivide(),
 
-                              // Container(
-                              //   padding: EdgeInsets.all(10),
-                              //   child: Text(
-                              //     "Các loại khoản tiền",
-                              //     style: TextStyle(
-                              //       fontSize: 16,
-                              //       fontWeight: FontWeight.w700,
-                              //       color: Theme.of(context).primaryColor,
-                              //     ),
-                              //   ),
-                              // ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Expanded(
-                                    child: SahaTextFieldNoBorder(
-                                      withAsterisk: true,
-                                      textInputType: const TextInputType
-                                          .numberWithOptions(decimal: true),
-                                      inputFormatters: [ThousandsFormatter()],
-                                      controller: controller
-                                          .moneyTextEditingController,
-                                      onChanged: (v) {
-                                        controller.postReq.value.money =
-                                            double.tryParse(SahaStringUtils()
-                                                .convertFormatText(controller
-                                                    .moneyTextEditingController
-                                                    .text));
-                                      },
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Không được để trống';
-                                        }
-                                        return null;
-                                      },
-                                      labelText: "Giá phòng",
-                                      hintText: "Nhập giá phòng",
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.only(
-                                        bottom: 15, right: 10),
-                                    child: const Text(
-                                      "VNĐ",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14),
-                                    ),
-                                  ),
-                                ],
+                            SahaTextFieldNoBorder(
+                              readOnly: false,
+                              withAsterisk: true,
+                              textInputType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp('[0-9.,]+')),
+                              ],
+                              controller: controller.areaTextEditingController,
+                              onChanged: (v) {
+                                controller.postReq.value.area = int.parse(v!);
+                              },
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Không được để trống';
+                                }
+                                return null;
+                              },
+                              labelText: "Diện tích (m²)",
+                              hintText: "Nhập diện tích",
+                            ),
+                            SahaDivide(),
+                            SahaTextFieldNoBorder(
+                              readOnly: false,
+                              textInputType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              controller: controller.quantityVehicleParked,
+                              onChanged: (v) {
+                                controller.postReq.value.quantityVehicleParked =
+                                    int.parse(v!);
+                              },
+                              labelText: "Số chỗ để xe",
+                              hintText: "Nhập sô chỗ để xe",
+                            ),
+                            SahaDivide(),
+                            SahaTextFieldNoBorder(
+                              readOnly: false,
+                              withAsterisk: true,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              textInputType: TextInputType.number,
+                              controller: controller.numberFloor,
+                              onChanged: (v) {
+                                controller.postReq.value.numberFloor =
+                                    int.parse(v!);
+                              },
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Không được để trống';
+                                }
+                                return null;
+                              },
+                              labelText: "Tầng",
+                              hintText: "Nhập số tầng",
+                            ),
+                            SahaDivide(),
+                            SahaTextFieldNoBorder(
+                              withAsterisk: true,
+                              textInputType: TextInputType.phone,
+                              controller:
+                                  controller.phoneNumberTextEditingController,
+                              onChanged: (v) {
+                                controller.postReq.value.phoneNumber = v;
+                              },
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Không được để trống';
+                                }
+                                return null;
+                              },
+                              labelText: "Số điện thoại",
+                              hintText: "Nhập số điện thoại",
+                            ),
+                            SahaDivide(),
+                            Padding(
+                              padding: const EdgeInsets.all(
+                                16,
                               ),
-                              SahaDivide(),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Expanded(
-                                    child: SahaTextFieldNoBorder(
-                                      withAsterisk: true,
-                                      textInputType: const TextInputType
-                                          .numberWithOptions(decimal: true),
-                                      inputFormatters: [ThousandsFormatter()],
-                                      controller: controller
-                                          .depositTextEditingController,
-                                      onChanged: (v) {
-                                        controller.postReq.value.deposit =
-                                            double.tryParse(SahaStringUtils()
-                                                .convertFormatText(controller
-                                                    .depositTextEditingController
-                                                    .text));
-                                      },
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Không được để trống';
-                                        }
-                                        return null;
-                                      },
-                                      labelText: "Tiền đặt cọc",
-                                      hintText: "Nhập tiền đặt cọc",
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.only(
-                                        bottom: 15, right: 10),
-                                    child: const Text(
-                                      "VNĐ",
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14),
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              SahaDivide(),
-
-                              SahaDivide(),
-                              Padding(
-                                padding: const EdgeInsets.all(10),
+                              child: InkWell(
+                                onTap: () {
+                                  SahaDialogApp.showDialogSex(
+                                    onChoose: (sex) {
+                                      controller.postReq.value.sex = sex;
+                                      controller.postReq.refresh();
+                                    },
+                                    sex: controller.postReq.value.sex ?? 0,
+                                  );
+                                },
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Image.asset(
-                                      'assets/icon_host/phi-dich-vu.png',
-                                      width: Get.width / 3.5,
+                                    const Text(
+                                      "Giới tính: ",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black54,
+                                      ),
                                     ),
-                                    // InkWell(
-                                    //   onTap: () {
-                                    //     Get.to(() => ChooseServiceScreen(
-                                    //         listServiceInput:
-                                    //             (addUpdatePostManagementController
-                                    //                         .motelPostRequest
-                                    //                         .value
-                                    //                         .moServicesReq ??
-                                    //                     [])
-                                    //                 .toList(),
-                                    //         onChoose: (List<Service> v) {
-                                    //           addUpdatePostManagementController
-                                    //               .motelPostRequest
-                                    //               .value
-                                    //               .moServicesReq = [];
-                                    //           (addUpdatePostManagementController
-                                    //                       .motelPostRequest
-                                    //                       .value
-                                    //                       .moServicesReq ??
-                                    //                   [])
-                                    //               .addAll(v);
-                                    //           addUpdatePostManagementController
-                                    //               .motelPostRequest
-                                    //               .refresh();
-                                    //         }));
-                                    //   },
-                                    //   child: Container(
-                                    //     child: const Center(
-                                    //         child: Icon(Icons.add)),
-                                    //   ),
-                                    // ),
+                                    Expanded(
+                                      child: Obx(
+                                        () => Text(
+                                          controller.postReq.value.sex == 0
+                                              ? "Nam, nữ"
+                                              : controller.postReq.value.sex ==
+                                                      1
+                                                  ? "Nam"
+                                                  : controller.postReq.value
+                                                              .sex ==
+                                                          2
+                                                      ? "Nữ"
+                                                      : "Nam, nữ",
+                                          textAlign: TextAlign.end,
+                                        ),
+                                      ),
+                                    ),
+                                    const Icon(
+                                        Icons.keyboard_arrow_down_rounded)
                                   ],
                                 ),
                               ),
-                              Obx(
-                                () => (controller.postReq.value.moServices ??
-                                            [])
-                                        .isEmpty
-                                    ? const SizedBox()
-                                    : Center(
-                                        child: Column(
-                                          children: [
-                                            Wrap(
-                                              spacing: 10,
-                                              runSpacing: 10,
-                                              children: [
-                                                ...(controller.postReq.value
-                                                            .moServices ??
-                                                        [])
-                                                    .map((e) {
-                                                  return itemService(
-                                                      value: (controller
-                                                                  .postReq
-                                                                  .value
-                                                                  .moServices ??
-                                                              [])
-                                                          .map((e) =>
-                                                              e.serviceName)
-                                                          .contains(
-                                                              e.serviceName),
-                                                      service: e,
-                                                      onCheck: () {});
-                                                }).toList()
-                                              ],
-                                            ),
-                                          ],
-                                        ),
+                            ),
+                            SahaDivide(),
+
+                            // Container(
+                            //   padding: EdgeInsets.all(10),
+                            //   child: Text(
+                            //     "Các loại khoản tiền",
+                            //     style: TextStyle(
+                            //       fontSize: 16,
+                            //       fontWeight: FontWeight.w700,
+                            //       color: Theme.of(context).primaryColor,
+                            //     ),
+                            //   ),
+                            // ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Expanded(
+                                  child: SahaTextFieldNoBorder(
+                                    withAsterisk: true,
+                                    textInputType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                    inputFormatters: [ThousandsFormatter()],
+                                    controller:
+                                        controller.moneyTextEditingController,
+                                    onChanged: (v) {
+                                      controller.postReq.value.money =
+                                          double.tryParse(SahaStringUtils()
+                                              .convertFormatText(controller
+                                                  .moneyTextEditingController
+                                                  .text));
+                                    },
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Không được để trống';
+                                      }
+                                      return null;
+                                    },
+                                    labelText: "Giá phòng",
+                                    hintText: "Nhập giá phòng",
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                      bottom: 15, right: 10),
+                                  child: const Text(
+                                    "VNĐ",
+                                    style: TextStyle(
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SahaDivide(),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Expanded(
+                                  child: SahaTextFieldNoBorder(
+                                    withAsterisk: true,
+                                    textInputType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                    inputFormatters: [ThousandsFormatter()],
+                                    controller:
+                                        controller.depositTextEditingController,
+                                    onChanged: (v) {
+                                      controller.postReq.value.deposit =
+                                          double.tryParse(SahaStringUtils()
+                                              .convertFormatText(controller
+                                                  .depositTextEditingController
+                                                  .text));
+                                    },
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Không được để trống';
+                                      }
+                                      return null;
+                                    },
+                                    labelText: "Tiền đặt cọc",
+                                    hintText: "Nhập tiền đặt cọc",
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                      bottom: 15, right: 10),
+                                  child: const Text(
+                                    "VNĐ",
+                                    style: TextStyle(
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            SahaDivide(),
+
+                            SahaDivide(),
+                            Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Image.asset(
+                                    'assets/icon_host/phi-dich-vu.png',
+                                    width: Get.width / 3.5,
+                                  ),
+                                  // InkWell(
+                                  //   onTap: () {
+                                  //     Get.to(() => ChooseServiceScreen(
+                                  //         listServiceInput:
+                                  //             (addUpdatePostManagementController
+                                  //                         .motelPostRequest
+                                  //                         .value
+                                  //                         .moServicesReq ??
+                                  //                     [])
+                                  //                 .toList(),
+                                  //         onChoose: (List<Service> v) {
+                                  //           addUpdatePostManagementController
+                                  //               .motelPostRequest
+                                  //               .value
+                                  //               .moServicesReq = [];
+                                  //           (addUpdatePostManagementController
+                                  //                       .motelPostRequest
+                                  //                       .value
+                                  //                       .moServicesReq ??
+                                  //                   [])
+                                  //               .addAll(v);
+                                  //           addUpdatePostManagementController
+                                  //               .motelPostRequest
+                                  //               .refresh();
+                                  //         }));
+                                  //   },
+                                  //   child: Container(
+                                  //     child: const Center(
+                                  //         child: Icon(Icons.add)),
+                                  //   ),
+                                  // ),
+                                ],
+                              ),
+                            ),
+                            Obx(
+                              () => (controller.postReq.value.moServices ?? [])
+                                      .isEmpty
+                                  ? const SizedBox()
+                                  : Center(
+                                      child: Column(
+                                        children: [
+                                          Wrap(
+                                            spacing: 10,
+                                            runSpacing: 10,
+                                            children: [
+                                              ...(controller.postReq.value
+                                                          .moServices ??
+                                                      [])
+                                                  .map((e) {
+                                                return itemService(
+                                                    value: (controller
+                                                                .postReq
+                                                                .value
+                                                                .moServices ??
+                                                            [])
+                                                        .map((e) =>
+                                                            e.serviceName)
+                                                        .contains(
+                                                            e.serviceName),
+                                                    service: e,
+                                                    onCheck: () {});
+                                              }).toList()
+                                            ],
+                                          ),
+                                        ],
                                       ),
+                                    ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              child: Image.asset(
+                                'assets/icon_host/tien-nghi.png',
+                                width: Get.width / 4,
                               ),
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                child: Image.asset(
-                                  'assets/icon_host/tien-nghi.png',
-                                  width: Get.width / 4,
-                                ),
-                              ),
-                              Container(
-                                width: Get.width,
-                                padding: const EdgeInsets.only(
-                                    left: 15, top: 10, bottom: 10),
-                                child: Obx(
-                                  () => Wrap(
-                                    spacing: 10,
-                                    runSpacing: 10,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.start,
-                                    children: [
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasWc ??
-                                              false,
-                                          tile: "Vệ sinh khép kín",
-                                          onCheck: () {
-                                            controller.postReq.value.hasWc =
-                                                !(controller.postReq.value
-                                                        .hasWc ??
-                                                    false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller.postReq.value
-                                                  .hasMezzanine ??
-                                              false,
-                                          tile: "Gác xép",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasMezzanine = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasMezzanine ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasBalcony ??
-                                              false,
-                                          tile: "Ban công",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasBalcony = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasBalcony ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller.postReq.value
+                            ),
+                            Container(
+                              width: Get.width,
+                              padding: const EdgeInsets.only(
+                                  left: 15, top: 10, bottom: 10),
+                              child: Obx(
+                                () => Wrap(
+                                  spacing: 10,
+                                  runSpacing: 10,
+                                  crossAxisAlignment: WrapCrossAlignment.start,
+                                  children: [
+                                    itemUtilities(
+                                        value: controller.postReq.value.hasWc ??
+                                            false,
+                                        tile: "Vệ sinh khép kín",
+                                        onCheck: () {
+                                          controller.postReq.value.hasWc =
+                                              !(controller
+                                                      .postReq.value.hasWc ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasMezzanine ??
+                                            false,
+                                        tile: "Gác xép",
+                                        onCheck: () {
+                                          controller.postReq.value
+                                              .hasMezzanine = !(controller
+                                                  .postReq.value.hasMezzanine ??
+                                              false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasBalcony ??
+                                            false,
+                                        tile: "Ban công",
+                                        onCheck: () {
+                                          controller.postReq.value.hasBalcony =
+                                              !(controller.postReq.value
+                                                      .hasBalcony ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasFingerPrint ??
+                                            false,
+                                        tile: "Ra vào vân tay",
+                                        onCheck: () {
+                                          controller.postReq.value
+                                              .hasFingerPrint = !(controller
+                                                  .postReq
+                                                  .value
                                                   .hasFingerPrint ??
-                                              false,
-                                          tile: "Ra vào vân tay",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasFingerPrint = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasFingerPrint ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller.postReq.value
-                                                  .hasOwnOwner ??
-                                              false,
-                                          tile: "Không chung chủ",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasOwnOwner = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasOwnOwner ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasPet ??
-                                              false,
-                                          tile: "Nuôi pet",
-                                          onCheck: () {
-                                            controller.postReq.value.hasPet =
-                                                !(controller.postReq.value
-                                                        .hasPet ??
-                                                    false);
-                                          }),
-                                    ],
-                                  ),
+                                              false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasOwnOwner ??
+                                            false,
+                                        tile: "Không chung chủ",
+                                        onCheck: () {
+                                          controller.postReq.value.hasOwnOwner =
+                                              !(controller.postReq.value
+                                                      .hasOwnOwner ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value:
+                                            controller.postReq.value.hasPet ??
+                                                false,
+                                        tile: "Nuôi pet",
+                                        onCheck: () {
+                                          controller.postReq.value.hasPet =
+                                              !(controller
+                                                      .postReq.value.hasPet ??
+                                                  false);
+                                        }),
+                                  ],
                                 ),
                               ),
-                              SahaDivide(),
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                child: Image.asset(
-                                  'assets/icon_host/noi-that.png',
-                                  width: Get.width / 4,
-                                ),
+                            ),
+                            SahaDivide(),
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              child: Image.asset(
+                                'assets/icon_host/noi-that.png',
+                                width: Get.width / 4,
                               ),
-                              Container(
-                                width: Get.width,
-                                padding: const EdgeInsets.only(
-                                    left: 15, top: 10, bottom: 10),
-                                child: Obx(
-                                  () => Wrap(
-                                    spacing: 10,
-                                    runSpacing: 10,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.start,
-                                    children: [
-                                      itemUtilities(
-                                          value: controller.postReq.value
+                            ),
+                            Container(
+                              width: Get.width,
+                              padding: const EdgeInsets.only(
+                                  left: 15, top: 10, bottom: 10),
+                              child: Obx(
+                                () => Wrap(
+                                  spacing: 10,
+                                  runSpacing: 10,
+                                  crossAxisAlignment: WrapCrossAlignment.start,
+                                  children: [
+                                    itemUtilities(
+                                        value: controller.postReq.value
+                                                .hasAirConditioner ??
+                                            false,
+                                        tile: "Điều hoà",
+                                        onCheck: () {
+                                          controller.postReq.value
+                                              .hasAirConditioner = !(controller
+                                                  .postReq
+                                                  .value
                                                   .hasAirConditioner ??
-                                              false,
-                                          tile: "Điều hoà",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                    .hasAirConditioner =
-                                                !(controller.postReq.value
-                                                        .hasAirConditioner ??
-                                                    false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller.postReq.value
+                                              false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasWaterHeater ??
+                                            false,
+                                        tile: "Bình nóng lạnh",
+                                        onCheck: () {
+                                          controller.postReq.value
+                                              .hasWaterHeater = !(controller
+                                                  .postReq
+                                                  .value
                                                   .hasWaterHeater ??
-                                              false,
-                                          tile: "Bình nóng lạnh",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasWaterHeater = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasWaterHeater ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasKitchen ??
-                                              false,
-                                          tile: "Kệ bếp",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasKitchen = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasKitchen ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasFridge ??
-                                              false,
-                                          tile: "Tủ lạnh",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasFridge = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasFridge ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasBed ??
-                                              false,
-                                          tile: "Giường ngủ",
-                                          onCheck: () {
-                                            controller.postReq.value.hasBed =
-                                                !(controller.postReq.value
-                                                        .hasBed ??
-                                                    false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller.postReq.value
+                                              false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasKitchen ??
+                                            false,
+                                        tile: "Kệ bếp",
+                                        onCheck: () {
+                                          controller.postReq.value.hasKitchen =
+                                              !(controller.postReq.value
+                                                      .hasKitchen ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasFridge ??
+                                            false,
+                                        tile: "Tủ lạnh",
+                                        onCheck: () {
+                                          controller.postReq.value.hasFridge =
+                                              !(controller.postReq.value
+                                                      .hasFridge ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value:
+                                            controller.postReq.value.hasBed ??
+                                                false,
+                                        tile: "Giường ngủ",
+                                        onCheck: () {
+                                          controller.postReq.value.hasBed =
+                                              !(controller
+                                                      .postReq.value.hasBed ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller.postReq.value
+                                                .hasWashingMachine ??
+                                            false,
+                                        tile: "Máy giặt",
+                                        onCheck: () {
+                                          controller.postReq.value
+                                              .hasWashingMachine = !(controller
+                                                  .postReq
+                                                  .value
                                                   .hasWashingMachine ??
-                                              false,
-                                          tile: "Máy giặt",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                    .hasWashingMachine =
-                                                !(controller.postReq.value
-                                                        .hasWashingMachine ??
-                                                    false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller.postReq.value
+                                              false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller.postReq.value
+                                                .hasKitchenStuff ??
+                                            false,
+                                        tile: "Đồ dùng bếp",
+                                        onCheck: () {
+                                          controller.postReq.value
+                                              .hasKitchenStuff = !(controller
+                                                  .postReq
+                                                  .value
                                                   .hasKitchenStuff ??
-                                              false,
-                                          tile: "Đồ dùng bếp",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                    .hasKitchenStuff =
-                                                !(controller.postReq.value
-                                                        .hasKitchenStuff ??
-                                                    false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasTable ??
-                                              false,
-                                          tile: "Bàn ghế",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasTable = !(controller
-                                                    .postReq.value.hasTable ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller.postReq.value
-                                                  .hasDecorativeLights ??
-                                              false,
-                                          tile: "Đèn trang trí",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                    .hasDecorativeLights =
-                                                !(controller.postReq.value
-                                                        .hasDecorativeLights ??
-                                                    false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasPicture ??
-                                              false,
-                                          tile: "Tranh trang trí",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasPicture = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasPicture ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasTree ??
-                                              false,
-                                          tile: "Cây cối trang trí",
-                                          onCheck: () {
-                                            controller.postReq.value.hasTree =
-                                                !(controller.postReq.value
-                                                        .hasTree ??
-                                                    false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasPillow ??
-                                              false,
-                                          tile: "Chăn,ga gối",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasPillow = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasPillow ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller.postReq.value
-                                                  .hasWardrobe ??
-                                              false,
-                                          tile: "Tủ quần áo",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasWardrobe = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasWardrobe ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller.postReq.value
-                                                  .hasMattress ??
-                                              false,
-                                          tile: "Nệm",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasMattress = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasMattress ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller.postReq.value
+                                              false);
+                                        }),
+                                    itemUtilities(
+                                        value:
+                                            controller.postReq.value.hasTable ??
+                                                false,
+                                        tile: "Bàn ghế",
+                                        onCheck: () {
+                                          controller.postReq.value.hasTable =
+                                              !(controller
+                                                      .postReq.value.hasTable ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller.postReq.value
+                                                .hasDecorativeLights ??
+                                            false,
+                                        tile: "Đèn trang trí",
+                                        onCheck: () {
+                                          controller.postReq.value
+                                                  .hasDecorativeLights =
+                                              !(controller.postReq.value
+                                                      .hasDecorativeLights ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasPicture ??
+                                            false,
+                                        tile: "Tranh trang trí",
+                                        onCheck: () {
+                                          controller.postReq.value.hasPicture =
+                                              !(controller.postReq.value
+                                                      .hasPicture ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value:
+                                            controller.postReq.value.hasTree ??
+                                                false,
+                                        tile: "Cây cối trang trí",
+                                        onCheck: () {
+                                          controller.postReq.value.hasTree =
+                                              !(controller
+                                                      .postReq.value.hasTree ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasPillow ??
+                                            false,
+                                        tile: "Chăn,ga gối",
+                                        onCheck: () {
+                                          controller.postReq.value.hasPillow =
+                                              !(controller.postReq.value
+                                                      .hasPillow ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasWardrobe ??
+                                            false,
+                                        tile: "Tủ quần áo",
+                                        onCheck: () {
+                                          controller.postReq.value.hasWardrobe =
+                                              !(controller.postReq.value
+                                                      .hasWardrobe ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasMattress ??
+                                            false,
+                                        tile: "Nệm",
+                                        onCheck: () {
+                                          controller.postReq.value.hasMattress =
+                                              !(controller.postReq.value
+                                                      .hasMattress ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasShoesRasks ??
+                                            false,
+                                        tile: "Kệ giày dép",
+                                        onCheck: () {
+                                          controller.postReq.value
+                                              .hasShoesRasks = !(controller
+                                                  .postReq
+                                                  .value
                                                   .hasShoesRasks ??
-                                              false,
-                                          tile: "Kệ giày dép",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasShoesRasks = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasShoesRasks ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasCurtain ??
-                                              false,
-                                          tile: "Rèm",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasCurtain = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasCurtain ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller.postReq.value
+                                              false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasCurtain ??
+                                            false,
+                                        tile: "Rèm",
+                                        onCheck: () {
+                                          controller.postReq.value.hasCurtain =
+                                              !(controller.postReq.value
+                                                      .hasCurtain ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasCeilingFans ??
+                                            false,
+                                        tile: "Quạt tràn",
+                                        onCheck: () {
+                                          controller.postReq.value
+                                              .hasCeilingFans = !(controller
+                                                  .postReq
+                                                  .value
                                                   .hasCeilingFans ??
-                                              false,
-                                          tile: "Quạt tràn",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasCeilingFans = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasCeilingFans ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasMirror ??
-                                              false,
-                                          tile: "Gương toàn thân",
-                                          onCheck: () {
-                                            controller.postReq.value
-                                                .hasMirror = !(controller
-                                                    .postReq
-                                                    .value
-                                                    .hasMirror ??
-                                                false);
-                                          }),
-                                      itemUtilities(
-                                          value: controller
-                                                  .postReq.value.hasSofa ??
-                                              false,
-                                          tile: "Sofa",
-                                          onCheck: () {
-                                            controller.postReq.value.hasSofa =
-                                                !(controller.postReq.value
-                                                        .hasSofa ??
-                                                    false);
-                                          }),
-                                    ],
-                                  ),
+                                              false);
+                                        }),
+                                    itemUtilities(
+                                        value: controller
+                                                .postReq.value.hasMirror ??
+                                            false,
+                                        tile: "Gương toàn thân",
+                                        onCheck: () {
+                                          controller.postReq.value.hasMirror =
+                                              !(controller.postReq.value
+                                                      .hasMirror ??
+                                                  false);
+                                        }),
+                                    itemUtilities(
+                                        value:
+                                            controller.postReq.value.hasSofa ??
+                                                false,
+                                        tile: "Sofa",
+                                        onCheck: () {
+                                          controller.postReq.value.hasSofa =
+                                              !(controller
+                                                      .postReq.value.hasSofa ??
+                                                  false);
+                                        }),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
+                      ),
                     ],
                   ),
                 ),
