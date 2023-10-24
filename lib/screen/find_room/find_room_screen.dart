@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gohomy/components/dialog/dialog.dart';
 import 'package:gohomy/model/motel_post.dart';
+import 'package:gohomy/screen/admin/motel_room_admin/tower/add_tower/map/map_screen.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../components/widget/post_item/post_item.dart';
@@ -108,11 +109,28 @@ class _FindRoomLoginScreenState extends State<FindRoomScreen> {
                 ),
                 child: TextField(
                   controller: searchEditingController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Tìm theo quận, địa điểm',
                     prefixIcon: Icon(Icons.search),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(5),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        Get.to(() => MapScreen(
+                              selectedAddress: (selectedAddress) {
+                                findRoomLoginController.textSearch =
+                                    selectedAddress;
+                                findRoomLoginController.getAllRoomPost(
+                                  isRefresh: true,
+                                );
+                              },
+                            ));
+                      },
+                      icon: Icon(
+                        Icons.location_on,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
                   ),
                   onChanged: (v) async {
                     EasyDebounce.debounce(
