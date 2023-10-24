@@ -6,6 +6,7 @@ import 'package:gohomy/components/appbar/saha_appbar.dart';
 import 'package:gohomy/screen/data_app_controller.dart';
 import 'package:gohomy/screen/find_room/post_roommate/post_roommate_controller.dart';
 import 'package:gohomy/screen/find_room/post_roommate/report_post_roommate/report_post_roommate_screen.dart';
+import 'package:gohomy/utils/map_navigation_utils.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../components/arlert/saha_alert.dart';
@@ -24,24 +25,26 @@ import '../../home/home_controller.dart';
 import '../../login/login_screen.dart';
 import 'list_post_roommate/list_post_roommate_screen.dart';
 
-
 class PostRoommateScreen extends StatelessWidget {
-   PostRoommateScreen({super.key,required this.postRoommateId}){
+  PostRoommateScreen({super.key, required this.postRoommateId}) {
     controller = PostRoommateController(postRoommateId: postRoommateId);
-   }
+  }
   final int postRoommateId;
   late PostRoommateController controller;
   DataAppController dataAppController = Get.find();
 
   @override
   Widget build(BuildContext context) {
+    String getAddress =
+        '${controller.post.value.addressDetail ?? ""}${controller.post.value.addressDetail == null ? "" : ", "}${controller.post.value.wardsName ?? ""}${controller.post.value.wardsName != null ? ", " : ""}${controller.post.value.districtName ?? ""}${controller.post.value.districtName != null ? ", " : ""}${controller.post.value.provinceName ?? ""}';
+
     return Scaffold(
       appBar: SahaAppBar(
         titleText: "Tìm người ở ghép",
         actions: [
-            IconButton(
+          IconButton(
               onPressed: () {
-                 showModalBottomSheet<void>(
+                showModalBottomSheet<void>(
                   context: context,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.only(
@@ -279,25 +282,32 @@ class PostRoommateScreen extends StatelessWidget {
                                         const SizedBox(
                                           height: 10,
                                         ),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.location_on_outlined,
-                                              color: Colors.grey,
-                                            ),
-                                            const SizedBox(
-                                              width: 5,
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                '${controller.post.value.addressDetail ?? ""}${controller.post.value.addressDetail == null ? "" : ", "}${controller.post.value.wardsName ?? ""}${controller.post.value.wardsName != null ? ", " : ""}${controller.post.value.districtName ?? ""}${controller.post.value.districtName != null ? ", " : ""}${controller.post.value.provinceName ?? ""}',
-                                                maxLines: 2,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
+                                        InkWell(
+                                          onTap: () {
+                                            MapNavigationUtils().openGoogleMaps(
+                                              '${controller.post.value.addressDetail ?? ""}${controller.post.value.addressDetail == null ? "" : ", "}${controller.post.value.wardsName ?? ""}${controller.post.value.wardsName != null ? ", " : ""}${controller.post.value.districtName ?? ""}${controller.post.value.districtName != null ? ", " : ""}${controller.post.value.provinceName ?? ""}',
+                                            );
+                                          },
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.location_on_outlined,
+                                                color: Colors.grey,
+                                              ),
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  '${controller.post.value.addressDetail ?? ""}${controller.post.value.addressDetail == null ? "" : ", "}${controller.post.value.wardsName ?? ""}${controller.post.value.wardsName != null ? ", " : ""}${controller.post.value.districtName ?? ""}${controller.post.value.districtName != null ? ", " : ""}${controller.post.value.provinceName ?? ""}',
+                                                  maxLines: 2,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                         const SizedBox(
                                           height: 10,
@@ -526,8 +536,7 @@ class PostRoommateScreen extends StatelessWidget {
                                     spacing: 10,
                                     runSpacing: 10,
                                     children:
-                                        (controller.post.value.moServices ??
-                                                [])
+                                        (controller.post.value.moServices ?? [])
                                             .map((e) => itemService(e))
                                             .toList(),
                                   ),
@@ -576,10 +585,10 @@ class PostRoommateScreen extends StatelessWidget {
                           // Get.to(() => PersonalInformationScreen(
                           //     phoneNumber: roomInformationController
                           //         .roomPost.value.user!.phoneNumber));
-                          Get.to(()=>ListPostRoommateScreen(
-                            phoneNumber:controller
-                                   .post.value.user?.phoneNumber,
-                          ));
+                          Get.to(() => ListPostRoommateScreen(
+                                phoneNumber:
+                                    controller.post.value.user?.phoneNumber,
+                              ));
                         },
                         child: Container(
                             padding: const EdgeInsets.all(15),
@@ -615,8 +624,7 @@ class PostRoommateScreen extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        controller.post.value.user?.name ??
-                                            "",
+                                        controller.post.value.user?.name ?? "",
                                         style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold),
@@ -681,8 +689,7 @@ class PostRoommateScreen extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                if (controller.post.value.hasMezzanine ==
-                                    true)
+                                if (controller.post.value.hasMezzanine == true)
                                   SizedBox(
                                     width: (Get.width - 30) / 4,
                                     height: (Get.width - 30) / 4,
@@ -761,8 +768,7 @@ class PostRoommateScreen extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                if (controller.post.value.hasOwnOwner ==
-                                    true)
+                                if (controller.post.value.hasOwnOwner == true)
                                   SizedBox(
                                     width: (Get.width - 30) / 4,
                                     height: (Get.width - 30) / 4,
@@ -837,8 +843,7 @@ class PostRoommateScreen extends StatelessWidget {
                             ),
                             Wrap(
                               children: [
-                                if (controller
-                                        .post.value.hasAirConditioner ==
+                                if (controller.post.value.hasAirConditioner ==
                                     true)
                                   SizedBox(
                                     width: (Get.width - 30) / 4,
@@ -970,8 +975,7 @@ class PostRoommateScreen extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                if (controller
-                                        .post.value.hasWashingMachine ==
+                                if (controller.post.value.hasWashingMachine ==
                                     true)
                                   SizedBox(
                                     width: (Get.width - 30) / 4,
@@ -1051,8 +1055,7 @@ class PostRoommateScreen extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                if (controller
-                                        .post.value.hasDecorativeLights ==
+                                if (controller.post.value.hasDecorativeLights ==
                                     true)
                                   SizedBox(
                                     width: (Get.width - 30) / 4,
@@ -1157,8 +1160,7 @@ class PostRoommateScreen extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                if (controller.post.value.hasWardrobe ==
-                                    true)
+                                if (controller.post.value.hasWardrobe == true)
                                   SizedBox(
                                     width: (Get.width - 30) / 4,
                                     height: (Get.width - 30) / 4,
@@ -1184,8 +1186,7 @@ class PostRoommateScreen extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                if (controller.post.value.hasMattress ==
-                                    true)
+                                if (controller.post.value.hasMattress == true)
                                   SizedBox(
                                     width: (Get.width - 30) / 4,
                                     height: (Get.width - 30) / 4,
@@ -1211,8 +1212,7 @@ class PostRoommateScreen extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                if (controller.post.value.hasShoesRasks ==
-                                    true)
+                                if (controller.post.value.hasShoesRasks == true)
                                   SizedBox(
                                     width: (Get.width - 30) / 4,
                                     height: (Get.width - 30) / 4,
@@ -1353,145 +1353,138 @@ class PostRoommateScreen extends StatelessWidget {
                 ),
               ),
       ),
-       bottomNavigationBar:
-           SizedBox(
-              height: 80,
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Get.to(() => ChatListLockScreen(
-                                toUser: controller
-                                    .post.value.user,
-
+      bottomNavigationBar: SizedBox(
+        height: 80,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                InkWell(
+                  onTap: () {
+                    Get.to(() => ChatListLockScreen(
+                          toUser: controller.post.value.user,
+                        ));
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(
+                          Icons.chat_outlined,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          'Chat',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    if (dataAppController.badge.value.user != null) {
+                      Call.call(controller.post.value.phoneNumber ?? "");
+                      controller.callPostRoommate();
+                    } else {
+                      Get.to(() => const LoginScreen(hasBack: true));
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.deepOrange,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(
+                          Icons.phone,
+                          color: Colors.deepOrange,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          'Gọi',
+                          style: TextStyle(
+                            color: Colors.deepOrange,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    if (dataAppController.badge.value.user != null) {
+                      SahaDialogApp.showDialogReport(onChoose: (v) {
+                        if (v == 0) {
+                          Get.back();
+                          Get.to(() => ReportPostRoommateScreen(
+                                idPostRoommate: postRoommateId,
                               ));
-                          
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            children: const [
-                              Icon(
-                                Icons.chat_outlined,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                'Chat',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
+                        } else {
+                          Get.back();
+                          Call.call(Get.find<HomeController>()
+                                  .homeApp
+                                  .value
+                                  .adminContact
+                                  ?.phoneNumber ??
+                              "");
+                        }
+                      });
+                    } else {
+                      Get.to(() => const LoginScreen(hasBack: true));
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
                       ),
-                 
-                      InkWell(
-                        onTap: () {
-                          if (dataAppController.badge.value.user != null) {
-                            Call.call(controller
-                                    .post.value.phoneNumber ??
-                                "");
-                            controller.callPostRoommate();
-                          
-                          } else {
-                            Get.to(() => const LoginScreen(hasBack: true));
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.deepOrange,
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            children: const [
-                              Icon(
-                                Icons.phone,
-                                color: Colors.deepOrange,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                'Gọi',
-                                style: TextStyle(
-                                  color: Colors.deepOrange,
-                                ),
-                              )
-                            ],
-                          ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(
+                          Icons.report,
+                          color: Colors.grey,
                         ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          if (dataAppController.badge.value.user != null) {
-                            SahaDialogApp.showDialogReport(onChoose: (v) {
-                              if (v == 0) {
-                                Get.back();
-                                Get.to(() => ReportPostRoommateScreen(
-                                      idPostRoommate: postRoommateId,
-                                    ));
-                              } else {
-                                Get.back();
-                                Call.call(Get.find<HomeController>()
-                                        .homeApp
-                                        .value
-                                        .adminContact
-                                        ?.phoneNumber ??
-                                    "");
-                              }
-                            });
-                          } else {
-                            Get.to(() => const LoginScreen(hasBack: true));
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey,
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            children: const [
-                              Icon(
-                                Icons.report,
-                                color: Colors.grey,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                'Báo cáo',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                ),
-                              )
-                            ],
-                          ),
+                        SizedBox(
+                          width: 5,
                         ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
+                        Text(
+                          'Báo cáo',
+                          style: TextStyle(
+                            color: Colors.grey,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
     );
   }
+
   Widget itemService(Service service) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
@@ -1534,10 +1527,10 @@ class PostRoommateScreen extends StatelessWidget {
       ),
     );
   }
+
   void sharePostImage() {
     SharePost().sharePostImage(
-        controller.post.value.images ?? [],
-        controller.post.value.title ?? "");
+        controller.post.value.images ?? [], controller.post.value.title ?? "");
   }
 
   void shareLink(String link) {
@@ -1565,7 +1558,7 @@ class PostRoommateScreen extends StatelessWidget {
               QrImageView(
                 data: link,
                 version: QrVersions.auto,
-                size: Get.width/1.5,
+                size: Get.width / 1.5,
               ),
             ],
           ),
