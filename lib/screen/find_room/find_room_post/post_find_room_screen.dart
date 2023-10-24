@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:gohomy/screen/find_room/find_room_post/post_find_room_controller.dart';
 import 'package:gohomy/screen/find_room/find_room_post/report_post_find_room/report_post_find_room_screen.dart';
+import 'package:gohomy/utils/map_navigation_utils.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../components/appbar/saha_appbar.dart';
@@ -32,19 +33,27 @@ class PostFindRoomScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String getAddress = '${controller.post.value.wardsName ?? ""} - '
+        '${controller.post.value.districtName ?? ''} - '
+        '${controller.post.value.provinceName ?? ''}';
+
     return Scaffold(
       appBar: SahaAppBar(
         titleText: "Tìm phòng",
         actions: [
-           if (dataAppController.currentUser.value.isAdmin == true)
+          if (dataAppController.currentUser.value.isAdmin == true)
             IconButton(
                 onPressed: () {
-                  Get.to(()=>AddCustomerPostFindRoomScreen(idPostFindRoom: postFindRoomId,isAdmin: true,))!.then((value) => controller.getPostFindRoom());
+                  Get.to(() => AddCustomerPostFindRoomScreen(
+                            idPostFindRoom: postFindRoomId,
+                            isAdmin: true,
+                          ))!
+                      .then((value) => controller.getPostFindRoom());
                 },
                 icon: const Icon(Icons.edit)),
           IconButton(
               onPressed: () {
-                 showModalBottomSheet<void>(
+                showModalBottomSheet<void>(
                   context: context,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.only(
@@ -59,7 +68,6 @@ class PostFindRoomScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
-                        
                           TextButton(
                             onPressed: () async {
                               Navigator.pop(context);
@@ -152,29 +160,32 @@ class PostFindRoomScreen extends StatelessWidget {
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                             const SizedBox(
-                                width: 40,
-                                height: 40,
-                                child:  Icon(
-                                  Icons.location_on,
-                                  color: Colors.deepOrange,
-                                
-                                 
+                          InkWell(
+                            onTap: () {
+                              MapNavigationUtils().openGoogleMaps(getAddress);
+                            },
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(
+                                  width: 40,
+                                  height: 40,
+                                  child: Icon(
+                                    Icons.location_on,
+                                    color: Colors.deepOrange,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(
-                                width: 4,
-                              ),
-                              Expanded(
-                                child: Text(
-                                  '${controller.post.value.wardsName ?? ""} - ${controller.post.value.districtName ?? ''} - ${controller.post.value.provinceName ?? ''}',
-                                  style: const TextStyle(fontSize: 18),
+                                const SizedBox(
+                                  width: 4,
                                 ),
-                              ),
-                            ],
+                                Expanded(
+                                  child: Text(
+                                    getAddress,
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -184,7 +195,9 @@ class PostFindRoomScreen extends StatelessWidget {
                           const Text(
                             "Khoảng giá phòng cần tìm",
                             style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           Row(
                             children: [
@@ -194,7 +207,6 @@ class PostFindRoomScreen extends StatelessWidget {
                                 child: Icon(
                                   FontAwesomeIcons.dollar,
                                   color: Colors.deepOrange,
-                                  
                                 ),
                               ),
                               const SizedBox(
@@ -223,10 +235,9 @@ class PostFindRoomScreen extends StatelessWidget {
                               const SizedBox(
                                 height: 40,
                                 width: 40,
-                                child:  Icon(
+                                child: Icon(
                                   Icons.person,
                                   color: Colors.deepOrange,
-                                  
                                 ),
                               ),
                               const SizedBox(
@@ -258,10 +269,9 @@ class PostFindRoomScreen extends StatelessWidget {
                               const SizedBox(
                                 height: 40,
                                 width: 40,
-                                child:  Icon(
+                                child: Icon(
                                   FontAwesomeIcons.marsAndVenus,
                                   color: Colors.deepOrange,
-                                  
                                 ),
                               ),
                               const SizedBox(
@@ -1129,9 +1139,10 @@ class PostFindRoomScreen extends StatelessWidget {
     );
   }
 
-   void shareLink(String link) {
+  void shareLink(String link) {
     SharePost().shareLink(link);
   }
+
   void shareQr(String link) {
     showDialog(
       context: Get.context!,
@@ -1153,7 +1164,7 @@ class PostFindRoomScreen extends StatelessWidget {
               QrImageView(
                 data: link,
                 version: QrVersions.auto,
-                size: Get.width/1.5,
+                size: Get.width / 1.5,
               ),
             ],
           ),

@@ -1,22 +1,21 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:badges/badges.dart' as b;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:card_swiper/card_swiper.dart';
-
 import 'package:flutter/material.dart';
-import 'package:badges/badges.dart' as b;
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:gohomy/components/dialog/dialog.dart';
-import 'package:gohomy/components/loading/loading_widget.dart';
 import 'package:gohomy/components/widget/post_item/post_item.dart';
 import 'package:gohomy/model/admin_discover.dart';
 import 'package:gohomy/screen/data_app_controller.dart';
-import 'package:gohomy/screen/navigator/navigator_controller.dart';
+import 'package:gohomy/utils/map_navigation_utils.dart';
 import 'package:gohomy/utils/string_utils.dart';
 import 'package:gohomy/utils/user_info.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../components/empty/saha_empty_image.dart';
 import '../../components/widget/post_item/post_find_room_item.dart';
 import '../../components/widget/post_item/post_item_hot.dart';
@@ -1296,6 +1295,10 @@ class _HomeScreenState extends State<HomeScreen> {
           : throw 'Could not launch https://zalo.me/$phone';
 
   Widget itemFindRoomPost(PostFindRoom post, bool isLogin) {
+    String getAddress = isLogin != true
+        ? "${post.districtName ?? ""}${post.districtName != null ? ", " : ""}${post.provinceName ?? ""}"
+        : '${post.wardsName ?? ""}${post.wardsName != null ? ", " : ""}${post.districtName ?? ""}${post.districtName != null ? ", " : ""}${post.provinceName ?? ""}';
+
     return InkWell(
       onTap: () {
         Get.to(() => PostFindRoomScreen(
@@ -1339,29 +1342,32 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(
-                        Icons.location_on,
-                        size: 14,
-                        color: Colors.grey,
-                      ),
-                      Expanded(
-                        child: Text(
-                          isLogin != true
-                              ? "${post.districtName ?? ""}${post.districtName != null ? ", " : ""}${post.provinceName ?? ""}"
-                              : '${post.wardsName ?? ""}${post.wardsName != null ? ", " : ""}${post.districtName ?? ""}${post.districtName != null ? ", " : ""}${post.provinceName ?? ""}',
-                          maxLines: 2,
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
-                            height: 1.2,
-                            letterSpacing: 0.1,
+                  InkWell(
+                    onTap: () {
+                      MapNavigationUtils().openGoogleMaps(getAddress);
+                    },
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.location_on,
+                          size: 14,
+                          color: Colors.grey,
+                        ),
+                        Expanded(
+                          child: Text(
+                            getAddress,
+                            maxLines: 2,
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                              height: 1.2,
+                              letterSpacing: 0.1,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   )
                 ],
               ),
