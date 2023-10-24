@@ -2,17 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:gohomy/components/button/saha_button.dart';
+import 'package:gohomy/const/color.dart';
 import 'package:gohomy/const/motel_type.dart';
 import 'package:gohomy/model/motel_room.dart';
+import 'package:gohomy/screen/admin/motel_room_admin/tower/add_tower/map/map_screen.dart';
 import 'package:gohomy/screen/data_app_controller.dart';
-
 import 'package:gohomy/screen/profile/bill/widget/dialog_add_service.dart';
 import 'package:pattern_formatter/numeric_formatter.dart';
-import 'package:video_compress/video_compress.dart';
 
 import '../../../../components/arlert/saha_alert.dart';
 import '../../../../components/dialog/dialog.dart';
@@ -52,7 +51,9 @@ class AddMotelRoomScreen extends StatelessWidget {
       this.towerInput,
       this.isFromPost}) {
     addMotelRoomController = AddMotelRoomController(
-        motelRoomInput: motelRoomInput, towerInput: towerInput, isFromPost: isFromPost);
+        motelRoomInput: motelRoomInput,
+        towerInput: towerInput,
+        isFromPost: isFromPost);
   }
 
   @override
@@ -301,27 +302,27 @@ class AddMotelRoomScreen extends StatelessWidget {
                 ///
                 ///
                 //if (isHaveTower == true)
-                  InkWell(
-                    onTap: () {
-                      Get.to(() => ChooseTowerScreen(
-                            towerChoose: addMotelRoomController.towerSelected,
-                            onChoose: (Tower tower) {
-                              addMotelRoomController.towerName.text =
-                                  tower.towerName ?? 'Chưa có thông tin';
-                              addMotelRoomController.towerSelected = tower;
-                              addMotelRoomController
-                                  .motelRoomRequest.value.towerId = tower.id;
-                                  addMotelRoomController.convertInfoFromTower();
-                            },
-                          ));
-                    },
-                    child: SahaTextFieldNoBorder(
-                      enabled: false,
-                      controller: addMotelRoomController.towerName,
-                      labelText: "Tên toà nhà",
-                      hintText: "Chọn toà nhà",
-                    ),
+                InkWell(
+                  onTap: () {
+                    Get.to(() => ChooseTowerScreen(
+                          towerChoose: addMotelRoomController.towerSelected,
+                          onChoose: (Tower tower) {
+                            addMotelRoomController.towerName.text =
+                                tower.towerName ?? 'Chưa có thông tin';
+                            addMotelRoomController.towerSelected = tower;
+                            addMotelRoomController
+                                .motelRoomRequest.value.towerId = tower.id;
+                            addMotelRoomController.convertInfoFromTower();
+                          },
+                        ));
+                  },
+                  child: SahaTextFieldNoBorder(
+                    enabled: false,
+                    controller: addMotelRoomController.towerName,
+                    labelText: "Tên toà nhà",
+                    hintText: "Chọn toà nhà",
                   ),
+                ),
                 SahaDivide(),
 
                 Container(
@@ -385,16 +386,10 @@ class AddMotelRoomScreen extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(15.0),
-                  child: 
-                  Obx(
-                    () => 
-                    VideoPickerSingle(
-                   
-                      linkVideo: 
-                      
-                      addMotelRoomController
+                  child: Obx(
+                    () => VideoPickerSingle(
+                      linkVideo: addMotelRoomController
                           .motelRoomRequest.value.videoLink,
-                        
                       onChange: (File? file) async {
                         addMotelRoomController.file = file;
                         if (file == null) {
@@ -407,85 +402,118 @@ class AddMotelRoomScreen extends StatelessWidget {
                 ),
                 SahaDivide(),
 
-                InkWell(
-                  onTap: () {
-                    SahaDialogApp.showDialogAddressChoose(
-                      hideAll: true,
-                      accept: () {},
-                      callback: (v) {
-                        addMotelRoomController.locationProvince.value = v;
-                        addMotelRoomController.motelRoomRequest.value.province =
-                            v.id;
-                        Get.back();
+                Stack(
+                  children: [
+                    InkWell(
+                      onTap: () {
                         SahaDialogApp.showDialogAddressChoose(
                           hideAll: true,
                           accept: () {},
-                          idProvince:
-                              addMotelRoomController.locationProvince.value.id,
                           callback: (v) {
-                            addMotelRoomController.locationDistrict.value = v;
+                            addMotelRoomController.locationProvince.value = v;
                             addMotelRoomController
-                                .motelRoomRequest.value.district = v.id;
+                                .motelRoomRequest.value.province = v.id;
                             Get.back();
                             SahaDialogApp.showDialogAddressChoose(
                               hideAll: true,
                               accept: () {},
-                              idDistrict: addMotelRoomController
-                                  .locationDistrict.value.id,
+                              idProvince: addMotelRoomController
+                                  .locationProvince.value.id,
                               callback: (v) {
-                                addMotelRoomController.locationWard.value = v;
+                                addMotelRoomController.locationDistrict.value =
+                                    v;
                                 addMotelRoomController
-                                    .motelRoomRequest.value.wards = v.id;
+                                    .motelRoomRequest.value.district = v.id;
                                 Get.back();
-                                SahaDialogApp.showDialogInputNote(
-                                    height: 50,
-                                    confirm: (v) {
-                                      if (v == null || v == "") {
-                                        SahaAlert.showToastMiddle(
-                                            message:
-                                                "Vui lòng nhập địa chỉ chi tiết");
-                                      } else {
-                                        addMotelRoomController.motelRoomRequest
-                                            .value.addressDetail = v;
-                                        addMotelRoomController.motelRoomRequest
-                                            .refresh();
-                                        var province = addMotelRoomController
-                                            .locationProvince;
-                                        var district = addMotelRoomController
-                                            .locationDistrict;
-                                        var ward =
-                                            addMotelRoomController.locationWard;
-                                        addMotelRoomController
-                                                .addressTextEditingController
-                                                .text =
-                                            "${addMotelRoomController.motelRoomRequest.value.addressDetail} - ${ward.value.name} - ${district.value.name} - ${province.value.name}";
-                                      }
-                                    },
-                                    title: "Địa chỉ chi tiết",
-                                    textInput: addMotelRoomController
-                                            .motelRoomRequest
-                                            .value
-                                            .addressDetail ??
-                                        "");
+                                SahaDialogApp.showDialogAddressChoose(
+                                  hideAll: true,
+                                  accept: () {},
+                                  idDistrict: addMotelRoomController
+                                      .locationDistrict.value.id,
+                                  callback: (v) {
+                                    addMotelRoomController.locationWard.value =
+                                        v;
+                                    addMotelRoomController
+                                        .motelRoomRequest.value.wards = v.id;
+                                    Get.back();
+                                    SahaDialogApp.showDialogInputNote(
+                                        height: 50,
+                                        confirm: (v) {
+                                          if (v == null || v == "") {
+                                            SahaAlert.showToastMiddle(
+                                                message:
+                                                    "Vui lòng nhập địa chỉ chi tiết");
+                                          } else {
+                                            addMotelRoomController
+                                                .motelRoomRequest
+                                                .value
+                                                .addressDetail = v;
+                                            addMotelRoomController
+                                                .motelRoomRequest
+                                                .refresh();
+                                            var province =
+                                                addMotelRoomController
+                                                    .locationProvince;
+                                            var district =
+                                                addMotelRoomController
+                                                    .locationDistrict;
+                                            var ward = addMotelRoomController
+                                                .locationWard;
+                                            addMotelRoomController
+                                                    .addressTextEditingController
+                                                    .text =
+                                                "${addMotelRoomController.motelRoomRequest.value.addressDetail} - ${ward.value.name} - ${district.value.name} - ${province.value.name}";
+                                          }
+                                        },
+                                        title: "Địa chỉ chi tiết",
+                                        textInput: addMotelRoomController
+                                                .motelRoomRequest
+                                                .value
+                                                .addressDetail ??
+                                            "");
+                                  },
+                                );
                               },
                             );
                           },
                         );
                       },
-                    );
-                  },
-                  child: SahaTextFieldNoBorder(
-                    enabled: false,
-                    labelText: "Địa chỉ",
-                    textInputType: TextInputType.text,
-                    controller:
-                        addMotelRoomController.addressTextEditingController,
-                    withAsterisk: true,
-                    onChanged: (v) {
-                      //addPostController.postReq.value.name = v;
-                    },
-                    hintText: "Chọn địa chỉ",
-                  ),
+                      child: SahaTextFieldNoBorder(
+                        enabled: false,
+                        icon: const Icon(
+                          Icons.location_pin,
+                          color: Colors.transparent,
+                        ),
+                        labelText: "Địa chỉ",
+                        textInputType: TextInputType.text,
+                        controller:
+                            addMotelRoomController.addressTextEditingController,
+                        withAsterisk: true,
+                        onChanged: (v) {
+                          //addPostController.postReq.value.name = v;
+                        },
+                        hintText: "Chọn địa chỉ",
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: IconButton(
+                          onPressed: () {
+                            Get.to(() => MapScreen(
+                                  selectedAddress: (selectedAddress) {
+                                    addMotelRoomController
+                                        .addressTextEditingController
+                                        .text = selectedAddress;
+                                  },
+                                ));
+                          },
+                          icon: const Icon(Icons.location_pin),
+                          color: AppColor.primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 SahaDivide(),
                 SahaTextFieldNoBorder(
@@ -1113,13 +1141,13 @@ class AddMotelRoomScreen extends StatelessWidget {
                           //   addMotelRoomController.updateMotelRoom();
                           // }
                           addMotelRoomController.updateMotelRoom();
-                      
                         },
                       ),
                     ),
                     if (motelRoomInput?.hasPost != true &&
                         isFromChooseRoom != true &&
-                        motelRoomInput?.status != 3 &&  motelRoomInput?.towerId == null)
+                        motelRoomInput?.status != 3 &&
+                        motelRoomInput?.towerId == null)
                       SahaButtonFullParent(
                         color: dataAppController
                                         .currentUser.value.decentralization ==
