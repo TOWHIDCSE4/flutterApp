@@ -211,8 +211,10 @@ class _MapScreenState extends State<MapScreen> {
                 /// Remove parentheses from address
                 String address = locationController.text;
                 address = address.substring(1, address.length - 1);
+                final splitAddress = address.split(',');
+                final formattedAddress = '${splitAddress[0]}, ${splitAddress[2]}, ${splitAddress[3]}';
 
-                widget.selectedAddress(address);
+                widget.selectedAddress(formattedAddress);
               },
               child: const Text('confirm'),
             )

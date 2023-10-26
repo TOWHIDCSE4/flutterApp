@@ -120,6 +120,8 @@ class _FindRoomLoginScreenState extends State<FindRoomScreen> {
                               selectedAddress: (selectedAddress) {
                                 findRoomLoginController.textSearch =
                                     selectedAddress;
+                                print('Selected address: $selectedAddress');
+                                searchEditingController.text = selectedAddress;
                                 findRoomLoginController.getAllRoomPost(
                                   isRefresh: true,
                                 );
