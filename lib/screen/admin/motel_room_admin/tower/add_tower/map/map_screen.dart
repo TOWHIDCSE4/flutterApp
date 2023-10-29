@@ -1,6 +1,7 @@
+import 'dart:developer';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places/flutter_google_places.dart' as loc;
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:gohomy/const/color.dart';
@@ -10,6 +11,7 @@ import 'package:google_maps_webservice/places.dart' as places;
 
 import 'direction_model.dart';
 import 'direction_repository.dart';
+import 'location_search_screen.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({
@@ -33,6 +35,7 @@ class _MapScreenState extends State<MapScreen> {
   Marker? _destination;
   Directions? _info;
   final Map<String, Marker> _markers = {};
+
   // GoogleMapController? _controller;
   final TextEditingController locationController = TextEditingController();
   bool isVisibleConfirmBtn = false;
@@ -207,14 +210,8 @@ class _MapScreenState extends State<MapScreen> {
           ? ElevatedButton(
               onPressed: () {
                 Get.back();
-
-                /// Remove parentheses from address
-                String address = locationController.text;
-                address = address.substring(1, address.length - 1);
-                final splitAddress = address.split(',');
-                final formattedAddress = '${splitAddress[0]}, ${splitAddress[2]}, ${splitAddress[3]}';
-
-                widget.selectedAddress(formattedAddress);
+                log("LOCATION GOOGLE MAPS:${locationController.text}");
+                widget.selectedAddress(locationController.text);
               },
               child: const Text('confirm'),
             )
@@ -241,12 +238,21 @@ class _MapScreenState extends State<MapScreen> {
       _googleMapController?.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
-              target: LatLng(info.latitude, info.longitude), zoom: 15),
+            target: LatLng(info.latitude, info.longitude),
+            zoom: 15,
+          ),
         ),
       );
+      _googleMapController!.showMarkerInfoWindow(marker.markerId);
+
       isVisibleConfirmBtn = true;
     });
-    locationController.text = placemarks.map((e) => e.street).toString();
+    log("onTapMap(): ${placemarks.toString()}");
+    locationController.text = "${placemarks.first.street}, "
+        "${placemarks.first.thoroughfare}, "
+        "${placemarks.first.subAdministrativeArea}, "
+        "${placemarks.first.administrativeArea}, "
+        "${placemarks.first.country}";
   }
 
   void _addMarker(LatLng pos) async {
@@ -282,7 +288,6 @@ class _MapScreenState extends State<MapScreen> {
           position: pos,
         );
       });
-
       // Get directions
       final directions = await DirectionsRepository()
           .getDirections(origin: _origin!.position, destination: pos);
@@ -291,27 +296,14 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _handleSearch() async {
-    places.Prediction? p = await loc.PlacesAutocomplete.show(
-        context: context,
-        apiKey: 'AIzaSyAqTbnMzItUekvEqmF8VmF1PXrqNKoFsDQ',
-        onError: onError, // call the onError function below
-        mode: loc.Mode.fullscreen,
-        language: 'en', //you can set any language for search
-        strictbounds: false,
-        types: [],
-        decoration: const InputDecoration(
-          hintText: 'search',
-          // focusedBorder: OutlineInputBorder(
-          //   borderRadius: BorderRadius.circular(20),
-          //   borderSide: const BorderSide(color: Colors.white),
-          // ),
-        ),
-        components: [] // you can determine search for just one country
-        );
-
+    places.Prediction? p = await Get.to(() => LocationSearchScreen());
     displayPrediction(p!);
     String address = p.description.toString();
     locationController.text = address;
+
+    setState(() {
+      isVisibleConfirmBtn = true;
+    });
   }
 
   void onError(places.PlacesAutocompleteResponse response) {
