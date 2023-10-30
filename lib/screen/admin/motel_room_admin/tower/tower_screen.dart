@@ -2,17 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-
-import 'package:gohomy/components/appbar/saha_appbar.dart';
 import 'package:gohomy/components/dialog/dialog.dart';
 import 'package:gohomy/components/empty/saha_empty_image.dart';
-import 'package:gohomy/screen/admin/motel_room_admin/admin_motel_room_controller.dart';
 import 'package:gohomy/screen/admin/users/user_filter/user_filter_screen.dart';
-import 'package:gohomy/utils/debounce.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../../components/loading/loading_full_screen.dart';
-import '../../../../components/text_field/saha_text_field_search.dart';
 import '../../../../model/tower.dart';
 import '../../../owner/motel_room/list_motel_room_screen.dart';
 import '../admin_motel_room_screen.dart';
@@ -41,8 +36,8 @@ class _TowerScreenState extends State<TowerScreen> {
   void initState() {
     if (widget.isNext == true) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        Get.to(() => AddTowerScreen())!
-            .then((value) => widget.controller.getAllTower(isRefresh: true));
+        Get.to(() => AddTowerScreen())
+            ?.then((value) => widget.controller.getAllTower(isRefresh: true));
       });
     }
 
@@ -77,7 +72,7 @@ class _TowerScreenState extends State<TowerScreen> {
                       onChoose: (user) {
                         widget.controller.userChoose.value = user;
                         widget.controller
-                            .getAllTower(isRefresh: true, userId: user!.id);
+                            .getAllTower(isRefresh: true);
                         Get.back();
                       }));
                 },
@@ -343,7 +338,28 @@ class _TowerScreenState extends State<TowerScreen> {
                     ),
                   ),
                 ],
-              ))
+              )),
+        if (tower.hasPost == true)
+          Positioned(
+            top: 60,
+            // right: Get.width / 6,
+            left: 10,
+            child: Container(
+              width: Get.width / 5,
+              height: 30,
+              decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(12)),
+              transform: Matrix4.rotationZ(-0.7),
+              child: const Center(
+                child: Text(
+                  'Đã đăng bài',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          )
       ],
     );
   }

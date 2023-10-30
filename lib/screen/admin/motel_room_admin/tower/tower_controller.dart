@@ -23,18 +23,17 @@ class TowerController extends GetxController {
     //     Get.find<DataAppController>().currentUser.value.id) {
     //   userChoose.value.name = 'Admin';
     // }
-    getAllTower(isRefresh: true, userId: userChoose.value.id);
+    getAllTower(isRefresh: true);
   }
 
   Future<void> getAllTower({
     bool? isRefresh,
-    int? userId,
   }) async {
     if (isRefresh == true) {
       currentPage = 1;
       isEnd = false;
     }
-
+    print('hehehe');
     try {
       if (isEnd == false) {
         //isLoading.value = true;
@@ -42,7 +41,7 @@ class TowerController extends GetxController {
         if (isAdmin == true) {
           var data = await RepositoryManager.manageRepository.getAllAdminTowers(
             page: currentPage,
-            userId: userId,
+            userId: userChoose.value.id,
           );
           if (isRefresh == true) {
             listTower(data!.data!.data!);

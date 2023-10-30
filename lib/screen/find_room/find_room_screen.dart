@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gohomy/components/dialog/dialog.dart';
 import 'package:gohomy/model/motel_post.dart';
+import 'package:gohomy/screen/admin/motel_room_admin/tower/add_tower/map/map_screen.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../components/widget/post_item/post_item.dart';
 import '../../model/location_address.dart';
@@ -12,6 +13,16 @@ import '../data_app_controller.dart';
 import 'find_room_controller.dart';
 
 class FindRoomScreen extends StatefulWidget {
+  FindRoomScreen({
+    Key? key,
+    this.typeAddress,
+    this.locationProvince,
+    this.locationDistrict,
+    this.callback,
+    this.phoneNumber,
+    this.isNewest,
+  }) : super(key: key);
+
   final TypeAddress? typeAddress;
   LocationAddress? locationProvince;
   LocationAddress? locationDistrict;
@@ -20,16 +31,6 @@ class FindRoomScreen extends StatefulWidget {
   bool? isNewest;
 
   late ChooseAddressCustomerController chooseAddressCustomerController;
-
-  FindRoomScreen(
-      {Key? key,
-      this.typeAddress,
-      this.locationProvince,
-      this.locationDistrict,
-      this.callback,
-      this.phoneNumber,
-      this.isNewest})
-      : super(key: key);
 
   @override
   State<FindRoomScreen> createState() => _FindRoomLoginScreenState();
@@ -80,9 +81,10 @@ class _FindRoomLoginScreenState extends State<FindRoomScreen> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-                begin: Alignment.bottomLeft,
-                end: Alignment.topRight,
-                colors: <Color>[Colors.deepOrange, Colors.orange]),
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
+              colors: <Color>[Colors.deepOrange, Colors.orange],
+            ),
           ),
         ),
         elevation: 0.0,
@@ -92,52 +94,80 @@ class _FindRoomLoginScreenState extends State<FindRoomScreen> {
             Get.back();
           },
         ),
+        titleSpacing: 0.0,
         title: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              height: 40,
-              width: Get.width / 1.2,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextField(
-                controller: searchEditingController,
-                decoration: const InputDecoration(
+            Expanded(
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  controller: searchEditingController,
+                  decoration: InputDecoration(
                     hintText: 'Tìm theo quận, địa điểm',
                     prefixIcon: Icon(Icons.search),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(5)),
-                onChanged: (v) async {
-                  EasyDebounce.debounce(
-                      'find_room_screen', const Duration(milliseconds: 300), () {
-                    findRoomLoginController.textSearch = v;
-                    findRoomLoginController.getAllRoomPost(isRefresh: true);
-                  });
-                },
+                    contentPadding: EdgeInsets.all(5),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        Get.to(() => MapScreen(
+                              selectedAddress: (selectedAddress) {
+                                findRoomLoginController.textSearch =
+                                    selectedAddress;
+                                print('Selected address: $selectedAddress');
+                                searchEditingController.text = selectedAddress;    
+                                findRoomLoginController.getAllRoomPost(
+                                  isRefresh: true,
+                                );
+                              },
+                            ));
+                      },
+                      icon: Icon(
+                        Icons.location_on,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                  onChanged: (v) async {
+                    EasyDebounce.debounce(
+                        'find_room_screen', const Duration(milliseconds: 300),
+                        () {
+                      findRoomLoginController.textSearch = v;
+                      findRoomLoginController.getAllRoomPost(isRefresh: true);
+                    });
+                  },
+                ),
               ),
             ),
-            const SizedBox(width: 10,),
-              Column(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
                 children: [
                   InkWell(
-                              onTap: () {
-                                SahaDialogApp.showBottomFilter(
-                                    motelPostReqInput: findRoomLoginController
-                                        .motelPostFilter.value,
-                                    onAccept: (v) {
-                                      findRoomLoginController
-                                          .motelPostFilter.value = v;
-                                      findRoomLoginController.getAllRoomPost(
-                                          isRefresh: true);
-                                    });
-                              },
-                              child: const Icon(Icons.filter_alt_outlined)),
-                   const Text("Bộ lọc",style: TextStyle(fontSize: 12),)
+                    onTap: () {
+                      SahaDialogApp.showBottomFilter(
+                          motelPostReqInput:
+                              findRoomLoginController.motelPostFilter.value,
+                          onAccept: (v) {
+                            findRoomLoginController.motelPostFilter.value = v;
+                            findRoomLoginController.getAllRoomPost(
+                                isRefresh: true);
+                          });
+                    },
+                    child: const Icon(Icons.filter_alt_outlined),
+                  ),
+                  const Text(
+                    "Bộ lọc",
+                    style: TextStyle(fontSize: 12),
+                  )
                 ],
-              )
+              ),
+            )
           ],
         ),
       ),
@@ -253,22 +283,6 @@ class _FindRoomLoginScreenState extends State<FindRoomScreen> {
                           ),
                         ),
                       ),
-                      // const SizedBox(
-                      //   width: 10,
-                      // ),
-                      // InkWell(
-                      //     onTap: () {
-                      //       SahaDialogApp.showBottomFilter(
-                      //           motelPostReqInput: findRoomLoginController
-                      //               .motelPostFilter.value,
-                      //           onAccept: (v) {
-                      //             findRoomLoginController
-                      //                 .motelPostFilter.value = v;
-                      //             findRoomLoginController.getAllRoomPost(
-                      //                 isRefresh: true);
-                      //           });
-                      //     },
-                      //     child: const Icon(Icons.filter_alt_outlined))
                     ],
                   ),
                 ),
@@ -348,7 +362,7 @@ class _FindRoomLoginScreenState extends State<FindRoomScreen> {
             PostItem(
               post: motelPost2,
               isLogin: dataAppController.isLogin.value,
-               height: 350,
+              height: 350,
             ),
         ],
       ),
