@@ -487,21 +487,21 @@ class _AdminMotelRoomScreenState extends State<AdminMotelRoomScreen>
   Widget roomItem(MotelRoom item) {
     return GestureDetector(
       onTap: () {
-        // Get.to(() => AddMotelRoomScreen(motelRoomInput: item))!.then((value) =>
-        //     widget.adminMotelRoomController
-        //         .getAllAdminMotelRoom(isRefresh: true));
-        Get.to(() => RoomInformationScreen(
-                  roomPostId: item.id,
-                  editButton: IconButton(
-                    onPressed: () {
-                      Get.to(() => AddMotelRoomScreen(motelRoomInput: item))!
-                          .then((value) => widget.adminMotelRoomController
-                              .getAllAdminMotelRoom(isRefresh: true));
-                    },
-                    icon: const Icon(Icons.edit),
-                  ),
-                ))!
-            .then((value) => Get.find<HomeController>().getAllHomeApp());
+        Get.to(() => AddMotelRoomScreen(motelRoomInput: item))!.then((value) =>
+            widget.adminMotelRoomController
+                .getAllAdminMotelRoom(isRefresh: true));
+        // Get.to(() => RoomInformationScreen(
+        //           roomPostId: item.id,
+        //           editButton: IconButton(
+        //             onPressed: () {
+        //               Get.to(() => AddMotelRoomScreen(motelRoomInput: item))!
+        //                   .then((value) => widget.adminMotelRoomController
+        //                       .getAllAdminMotelRoom(isRefresh: true));
+        //             },
+        //             icon: const Icon(Icons.edit),
+        //           ),
+        //         ))!
+        //     .then((value) => Get.find<HomeController>().getAllHomeApp());
       },
       child: Stack(
         children: [
@@ -734,14 +734,22 @@ class _AdminMotelRoomScreenState extends State<AdminMotelRoomScreen>
                             mess: "Bạn chắc chắn muốn ẩn phòng không?",
                             onOK: () {
                               widget.adminMotelRoomController
-                                  .updateMotelRoomHiddenStatus(item.id, true);
+                                  .updateMotelRoomHiddenStatus(
+                                motelId: item.id!,
+                                status: 1,
+                                towerMotelId: item.towerId!,
+                              );
                             });
                       } else {
                         SahaDialogApp.showDialogYesNo(
                             mess: "Bạn chắc chắn muốn hiện lại phòng không?",
                             onOK: () {
                               widget.adminMotelRoomController
-                                  .updateMotelRoomHiddenStatus(item.id, false);
+                                  .updateMotelRoomHiddenStatus(
+                                motelId: item.id!,
+                                status: 0,
+                                towerMotelId: item.towerId!,
+                              );
                             });
                       }
                     },
