@@ -76,7 +76,7 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAqTbnMzItUekvEqmF8VmF1PXrqNKoFsDQ"/>
+            android:value="AIzaSyBU-opJEU3OexnOaPAp70FgftYbuB6TlIY"/>
 
     </application>
 </manifest>
