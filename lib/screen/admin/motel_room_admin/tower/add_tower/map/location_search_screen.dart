@@ -23,7 +23,9 @@ class LocationSearchScreen extends GetView<LocationSearchController> {
         titleSpacing: 0,
       ),
       body: Obx(() {
-        return controller.state.status.isInitial
+        return controller.state.status.isInitial ||
+                (controller.state.status.isLoaded &&
+                    controller.state.data.length == 0)
             ? Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: const Center(child: Text("Search for a location")),

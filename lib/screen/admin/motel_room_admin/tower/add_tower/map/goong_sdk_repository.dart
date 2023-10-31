@@ -28,6 +28,8 @@ class GoongSDKRepository {
     if (response.statusCode == 200) {
       final predictions = <places.Prediction?>[];
 
+      if (response.data['predictions'] == null) return [];
+
       for (final prediction in response.data['predictions']) {
         predictions.add(places.Prediction.fromJson(prediction));
       }
