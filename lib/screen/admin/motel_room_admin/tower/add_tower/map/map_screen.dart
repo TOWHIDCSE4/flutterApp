@@ -323,7 +323,19 @@ class _MapScreenState extends State<MapScreen> {
       final lat = detail?.result.geometry!.location.lat;
       final lng = detail?.result.geometry!.location.lng;
 
+      _markers.clear(); //clear old marker and set new one
+      _origin = null;
+      _destination = null;
+      final marker = Marker(
+        markerId: const MarkerId('deliveryMarker'),
+        position: LatLng(lat!, lng!),
+        infoWindow: const InfoWindow(
+          title: '',
+        ),
+      );
+
       setState(() {
+        _markers['myLocation'] = marker;
         isVisibleConfirmBtn = true;
       });
       _googleMapController?.animateCamera(
