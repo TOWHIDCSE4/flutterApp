@@ -15,7 +15,7 @@ class FindRoomController extends GetxController {
   bool isEnd = false;
   var isLoading = false.obs;
   var loadInit = true.obs;
-  String? textSearch;
+  RxString textSearch = "".obs;
   double? fromMoney;
   double? maxMoney;
   String? phoneNumber;
@@ -59,22 +59,29 @@ class FindRoomController extends GetxController {
 
   Future<void> getAllRoomPost({
     bool? isRefresh,
+    bool isFromSearchBar = false,
   }) async {
     if (isRefresh == true) {
       currentPage = 1;
       isEnd = false;
     }
 
-    motelPostFilter.value.province = locationProvince.value.id;
-    motelPostFilter.value.district = locationDistrict.value.id;
-    motelPostFilter.value.wards = locationWard.value.id;
+    if (!isFromSearchBar) {
+      motelPostFilter.value.province = locationProvince.value.id;
+      motelPostFilter.value.district = locationDistrict.value.id;
+      motelPostFilter.value.wards = locationWard.value.id;
+    } else {
+      motelPostFilter.value.province = null;
+      motelPostFilter.value.district = null;
+      motelPostFilter.value.wards = null;
+    }
 
     try {
       if (isEnd == false) {
         isLoading.value = true;
         var data = await RepositoryManager.roomPostRepository.getAllRoomPost(
           page: currentPage,
-          search: textSearch,
+          search: textSearch.value,
           district: motelPostFilter.value.district,
           province: motelPostFilter.value.province,
           wards: motelPostFilter.value.wards,

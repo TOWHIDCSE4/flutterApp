@@ -118,12 +118,13 @@ class _FindRoomLoginScreenState extends State<FindRoomScreen> {
                       onPressed: () {
                         Get.to(() => MapScreen(
                               selectedAddress: (selectedAddress) {
-                                findRoomLoginController.textSearch =
-                                    selectedAddress;
+                                findRoomLoginController.textSearch.value =
+                                    selectedAddress.split(',').last.trim();
                                 print('Selected address: $selectedAddress');
                                 searchEditingController.text = selectedAddress;
                                 findRoomLoginController.getAllRoomPost(
                                   isRefresh: true,
+                                  isFromSearchBar: true,
                                 );
                               },
                             ));
@@ -138,8 +139,11 @@ class _FindRoomLoginScreenState extends State<FindRoomScreen> {
                     EasyDebounce.debounce(
                         'find_room_screen', const Duration(milliseconds: 300),
                         () {
-                      findRoomLoginController.textSearch = v;
-                      findRoomLoginController.getAllRoomPost(isRefresh: true);
+                      findRoomLoginController.textSearch.value = v;
+                      findRoomLoginController.getAllRoomPost(
+                        isRefresh: true,
+                        isFromSearchBar: true,
+                      );
                     });
                   },
                 ),
@@ -177,118 +181,133 @@ class _FindRoomLoginScreenState extends State<FindRoomScreen> {
         floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              floating: true,
-              backgroundColor: Colors.white,
-              forceElevated: innerBoxIsScrolled,
-              flexibleSpace: Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10.0, right: 10),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: InkWell(
-                          onTap: () {
-                            SahaDialogApp.showDialogAddressChoose(
-                              accept: () {},
-                              callback: (v) {
-                                if (v.name == 'Tất cả') {
-                                  findRoomLoginController.locationProvince
-                                      .value = LocationAddress();
-                                  findRoomLoginController.locationDistrict
-                                      .value = LocationAddress();
-                                  findRoomLoginController.locationWard.value =
-                                      LocationAddress();
-                                  findRoomLoginController.getAllRoomPost(
-                                      isRefresh: true);
-                                  Get.back();
-                                } else {
-                                  findRoomLoginController
-                                      .locationProvince.value = v;
-                                  findRoomLoginController.locationDistrict
-                                      .value = LocationAddress();
-                                  findRoomLoginController.locationWard.value =
-                                      LocationAddress();
-
-                                  findRoomLoginController.getAllRoomPost(
-                                    isRefresh: true,
-                                  );
-                                  Get.back();
-                                  SahaDialogApp.showDialogAddressChoose(
-                                    accept: () {},
-                                    idProvince: findRoomLoginController
-                                        .locationProvince.value.id,
-                                    callback: (v) {
-                                      if (v.name == 'Tất cả') {
-                                        Get.back();
-                                      } else {
-                                        findRoomLoginController
-                                            .locationDistrict.value = v;
-                                        findRoomLoginController.getAllRoomPost(
-                                          isRefresh: true,
-                                        );
-                                        Get.back();
-                                        SahaDialogApp.showDialogAddressChoose(
-                                          accept: () {},
-                                          idDistrict: findRoomLoginController
-                                              .locationDistrict.value.id,
-                                          callback: (v) {
-                                            if (v.name == 'Tất cả') {
-                                              Get.back();
-                                            } else {
-                                              findRoomLoginController
-                                                  .locationWard.value = v;
-                                              findRoomLoginController
-                                                  .getAllRoomPost(
-                                                isRefresh: true,
-                                              );
-                                              Get.back();
-                                            }
-                                          },
-                                        );
-                                      }
-                                    },
-                                  );
-                                }
-                              },
-                            );
-                          },
+            Obx(() {
+              return findRoomLoginController.textSearch.isEmpty
+                  ? SliverAppBar(
+                      automaticallyImplyLeading: false,
+                      floating: true,
+                      backgroundColor: Colors.white,
+                      forceElevated: innerBoxIsScrolled,
+                      flexibleSpace: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10.0, right: 10),
                           child: Row(
                             children: [
-                              Icon(
-                                Icons.location_on,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
                               Expanded(
-                                child: Obx(() {
-                                  var province =
-                                      findRoomLoginController.locationProvince;
-                                  var district =
-                                      findRoomLoginController.locationDistrict;
-                                  var ward =
-                                      findRoomLoginController.locationWard;
-                                  return province.value.id != null ||
-                                          district.value.id != null ||
-                                          ward.value.id != null
-                                      ? Text(
-                                          'Khu vực: ${ward.value.name ?? ""}${ward.value.name != null ? ", " : ""}${district.value.name ?? ""}${district.value.name != null ? ", " : ""}${province.value.name ?? ""}')
-                                      : const Text('Khu vực: Toàn quốc');
-                                }),
+                                child: InkWell(
+                                  onTap: () {
+                                    SahaDialogApp.showDialogAddressChoose(
+                                      accept: () {},
+                                      callback: (v) {
+                                        if (v.name == 'Tất cả') {
+                                          findRoomLoginController
+                                              .locationProvince
+                                              .value = LocationAddress();
+                                          findRoomLoginController
+                                              .locationDistrict
+                                              .value = LocationAddress();
+                                          findRoomLoginController.locationWard
+                                              .value = LocationAddress();
+                                          findRoomLoginController
+                                              .getAllRoomPost(isRefresh: true);
+                                          Get.back();
+                                        } else {
+                                          findRoomLoginController
+                                              .locationProvince.value = v;
+                                          findRoomLoginController
+                                              .locationDistrict
+                                              .value = LocationAddress();
+                                          findRoomLoginController.locationWard
+                                              .value = LocationAddress();
+
+                                          findRoomLoginController
+                                              .getAllRoomPost(
+                                            isRefresh: true,
+                                          );
+                                          Get.back();
+                                          SahaDialogApp.showDialogAddressChoose(
+                                            accept: () {},
+                                            idProvince: findRoomLoginController
+                                                .locationProvince.value.id,
+                                            callback: (v) {
+                                              if (v.name == 'Tất cả') {
+                                                Get.back();
+                                              } else {
+                                                findRoomLoginController
+                                                    .locationDistrict.value = v;
+                                                findRoomLoginController
+                                                    .getAllRoomPost(
+                                                  isRefresh: true,
+                                                );
+                                                Get.back();
+                                                SahaDialogApp
+                                                    .showDialogAddressChoose(
+                                                  accept: () {},
+                                                  idDistrict:
+                                                      findRoomLoginController
+                                                          .locationDistrict
+                                                          .value
+                                                          .id,
+                                                  callback: (v) {
+                                                    if (v.name == 'Tất cả') {
+                                                      Get.back();
+                                                    } else {
+                                                      findRoomLoginController
+                                                          .locationWard
+                                                          .value = v;
+                                                      findRoomLoginController
+                                                          .getAllRoomPost(
+                                                        isRefresh: true,
+                                                      );
+                                                      Get.back();
+                                                    }
+                                                  },
+                                                );
+                                              }
+                                            },
+                                          );
+                                        }
+                                      },
+                                    );
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.location_on,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Expanded(
+                                        child: Obx(() {
+                                          var province = findRoomLoginController
+                                              .locationProvince;
+                                          var district = findRoomLoginController
+                                              .locationDistrict;
+                                          var ward = findRoomLoginController
+                                              .locationWard;
+                                          return province.value.id != null ||
+                                                  district.value.id != null ||
+                                                  ward.value.id != null
+                                              ? Text(
+                                                  'Khu vực: ${ward.value.name ?? ""}${ward.value.name != null ? ", " : ""}${district.value.name ?? ""}${district.value.name != null ? ", " : ""}${province.value.name ?? ""}')
+                                              : const Text(
+                                                  'Khu vực: Toàn quốc');
+                                        }),
+                                      ),
+                                      const Icon(Icons.arrow_drop_down)
+                                    ],
+                                  ),
+                                ),
                               ),
-                              const Icon(Icons.arrow_drop_down)
                             ],
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+                    )
+                  : SliverToBoxAdapter(child: Container());
+            }),
           ];
         },
         body: Obx(

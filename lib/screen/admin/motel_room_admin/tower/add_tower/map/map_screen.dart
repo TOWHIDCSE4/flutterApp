@@ -206,6 +206,7 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: isVisibleConfirmBtn
           ? ElevatedButton(
               onPressed: () {
@@ -213,7 +214,7 @@ class _MapScreenState extends State<MapScreen> {
                 log("LOCATION GOOGLE MAPS:${locationController.text}");
                 widget.selectedAddress(locationController.text);
               },
-              child: const Text('confirm'),
+              child: const Text('Confirm'),
             )
           : null,
     );
@@ -249,10 +250,9 @@ class _MapScreenState extends State<MapScreen> {
     });
     log("onTapMap(): ${placemarks.toString()}");
     locationController.text = "${placemarks.first.street}, "
-        "${placemarks.first.thoroughfare}, "
-        "${placemarks.first.subAdministrativeArea}, "
-        "${placemarks.first.administrativeArea}, "
-        "${placemarks.first.country}";
+        "${placemarks.first.locality}, " //ward
+        "${placemarks.first.subAdministrativeArea}, " //district
+        "${placemarks.first.administrativeArea}"; //province
   }
 
   void _addMarker(LatLng pos) async {
