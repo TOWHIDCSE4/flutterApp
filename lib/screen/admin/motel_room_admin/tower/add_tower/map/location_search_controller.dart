@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:gohomy/utils/base/base_state.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'auto_complete_search_result_repository.dart';
+import 'goong_sdk_repository.dart';
 
 class LocationSearchController extends GetxController {
   final _state = BaseState().obs;
@@ -19,7 +19,7 @@ class LocationSearchController extends GetxController {
       _state.value = BaseState.loading();
 
       _state.value = BaseState.loaded(
-        await AutoCompleteSearchResultRepository().getSearchResult(
+        await GoongSDKRepository().placeSearchAutoComplete(
           input: searchController.text,
           destination: destination,
         ),

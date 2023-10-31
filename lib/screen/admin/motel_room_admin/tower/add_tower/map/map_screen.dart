@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:gohomy/const/color.dart';
-import 'package:google_api_headers/google_api_headers.dart' as header;
+import 'package:gohomy/screen/admin/motel_room_admin/tower/add_tower/map/goong_sdk_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart' as places;
 
@@ -297,13 +297,9 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _handleSearch() async {
     places.Prediction? p = await Get.to(() => LocationSearchScreen());
-    displayPrediction(p!);
+    await displayPrediction(p!);
     String address = p.description.toString();
     locationController.text = address;
-
-    setState(() {
-      isVisibleConfirmBtn = true;
-    });
   }
 
   void onError(places.PlacesAutocompleteResponse response) {
@@ -320,33 +316,23 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> displayPrediction(places.Prediction p) async {
-    places.GoogleMapsPlaces _places = places.GoogleMapsPlaces(
-      apiKey: 'AIzaSyBU-opJEU3OexnOaPAp70FgftYbuB6TlIY',
-      apiHeaders: await const header.GoogleApiHeaders().getHeaders(),
-    );
-    places.PlacesDetailsResponse detail =
-        await _places.getDetailsByPlaceId(p.placeId!);
-// detail will get place details that user chose from Prediction search
-    final lat = detail.result.geometry!.location.lat;
-    final lng = detail.result.geometry!.location.lng;
-    _markers.clear(); //clear old marker and set new one
-    _origin = null;
-    _destination = null;
-    final marker = Marker(
-      markerId: const MarkerId('deliveryMarker'),
-      position: LatLng(lat, lng),
-      infoWindow: const InfoWindow(
-        title: '',
-      ),
-    );
-    setState(() {
-      _markers['myLocation'] = marker;
+    try {
+      places.PlacesDetailsResponse? detail =
+          await GoongSDKRepository().getPlaceDetail(p.placeId!);
+      // detail will get place details that user chose from Prediction search
+      final lat = detail?.result.geometry!.location.lat;
+      final lng = detail?.result.geometry!.location.lng;
+
+      setState(() {
+        isVisibleConfirmBtn = true;
+      });
       _googleMapController?.animateCamera(
         CameraUpdate.newCameraPosition(
-          CameraPosition(target: LatLng(lat, lng), zoom: 15),
+          CameraPosition(target: LatLng(lat!, lng!), zoom: 15),
         ),
       );
-      isVisibleConfirmBtn = true;
-    });
+    } catch (e, stackTrace) {
+      log('displayPrediction() error: $e, stackTrace: $stackTrace');
+    }
   }
 }
